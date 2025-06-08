@@ -25,7 +25,7 @@ public class PomodoroView extends JFrame {
 
     private void initComponents() {
         setTitle("Pomodoro Timer");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        // setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(400, 300);
         setLocationRelativeTo(null); // Center the window
         setLayout(new GridBagLayout());
