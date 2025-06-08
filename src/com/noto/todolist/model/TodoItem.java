@@ -1,4 +1,4 @@
-package model;
+package com.noto.todolist.model;
 
 /**
  * Represents a single checklist item within a note.

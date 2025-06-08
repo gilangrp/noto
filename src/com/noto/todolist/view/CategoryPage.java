@@ -1,12 +1,14 @@
-package todolistapp;
+package com.noto.todolist.view;
 
 import javax.swing.*;
+
+import com.noto.database.DatabaseManager;
+import com.noto.todolist.model.NoteData;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import java.util.List;
-import database.DatabaseManager;
-import model.NoteData;
 
 /**
  * CategoryPage - A page to view and manage note categories

@@ -1,4 +1,4 @@
-package com.mycompany.pomodorotimer.model;
+package com.noto.pomodorotimer.model;
 
 /**
  * Represents the current state of the Pomodoro timer.

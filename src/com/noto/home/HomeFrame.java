@@ -1,24 +1,24 @@
+package com.noto.home;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.table.*;
+
+import com.noto.auth.LoginFrame;
+import com.noto.database.DatabaseManager;
+import com.noto.pomodorotimer.controller.PomodoroController;
+import com.noto.pomodorotimer.model.PomodoroConfig;
+import com.noto.pomodorotimer.model.TimerState;
+import com.noto.pomodorotimer.view.*;
+import com.noto.todolist.view.CategoryButton;
+import com.noto.todolist.view.CategoryPage;
+import com.noto.todolist.view.NotesToDo;
+
 import javax.swing.event.TableModelEvent;
 import java.awt.*;
 import java.awt.event.*;
 // Removed java.sql.* as direct connection is no longer used here
 import java.util.*;
 import java.util.List; // Explicit import for List
-// Import the new NotesToDo class
-import todolistapp.NotesToDo;
-// Import CategoryPage and CategoryButton
-import todolistapp.CategoryPage;
-import todolistapp.CategoryButton;
-// Import DatabaseManager for stats/notifications
-import database.DatabaseManager;
-
-import com.mycompany.pomodorotimer.controller.PomodoroController;
-import com.mycompany.pomodorotimer.model.PomodoroConfig;
-import com.mycompany.pomodorotimer.model.TimerState;
-import com.mycompany.pomodorotimer.view.*;
 
 /**
  * Redesigned Home frame displaying statistics, notifications, and navigation.

@@ -1,4 +1,4 @@
-package com.mycompany.pomodorotimer.model;
+package com.noto.pomodorotimer.model;
 
 /**
  * Stores Pomodoro configuration settings (durations, cycles).

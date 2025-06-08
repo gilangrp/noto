@@ -1,4 +1,4 @@
-package com.mycompany.pomodorotimer.view;
+package com.noto.pomodorotimer.view;
 
 import javax.swing.*;
 import java.awt.*;

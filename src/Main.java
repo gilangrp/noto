@@ -1,4 +1,7 @@
 import javax.swing.*;
+
+import com.noto.auth.LoginFrame;
+
 import java.awt.*;
 
 public class Main {

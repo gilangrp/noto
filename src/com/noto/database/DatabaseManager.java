@@ -1,4 +1,4 @@
-package database;
+package com.noto.database;
 
 import java.sql.*;
 import java.io.IOException;
@@ -9,9 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-// Import the shared model classes
-import model.NoteData;
-import model.TodoItem;
+import com.noto.todolist.model.NoteData;
+import com.noto.todolist.model.TodoItem;
 
 /**
  * Database manager for handling all database operations using MySQL.

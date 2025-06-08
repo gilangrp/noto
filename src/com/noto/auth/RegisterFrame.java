@@ -1,11 +1,13 @@
+package com.noto.auth;
 import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.event.*; // Keep for DocumentListener
+
+import com.noto.database.DatabaseManager;
+
 import java.util.regex.Pattern;
-// Import DatabaseManager
-import database.DatabaseManager;
 
 public class RegisterFrame extends JFrame {
     private JTextField nameField;

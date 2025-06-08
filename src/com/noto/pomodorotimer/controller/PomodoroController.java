@@ -1,10 +1,11 @@
-package com.mycompany.pomodorotimer.controller;
-
-import com.mycompany.pomodorotimer.model.PomodoroConfig;
-import com.mycompany.pomodorotimer.model.TimerState;
-import com.mycompany.pomodorotimer.view.PomodoroView;
+package com.noto.pomodorotimer.controller;
 
 import javax.swing.Timer;
+
+import com.noto.pomodorotimer.model.PomodoroConfig;
+import com.noto.pomodorotimer.model.TimerState;
+import com.noto.pomodorotimer.view.PomodoroView;
+
 import javax.swing.JOptionPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

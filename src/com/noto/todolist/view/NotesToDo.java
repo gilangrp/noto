@@ -1,15 +1,15 @@
-package todolistapp;
+package com.noto.todolist.view;
 
 import javax.swing.*;
+
+import com.noto.database.DatabaseManager;
+import com.noto.todolist.model.NoteData;
+import com.noto.todolist.model.TodoItem;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import java.util.List;
-// Import the existing DatabaseManager
-import database.DatabaseManager;
-// Import the shared model classes
-import model.NoteData;
-import model.TodoItem;
 
 public class NotesToDo extends JFrame {
     private DefaultListModel<String> noteListModel;

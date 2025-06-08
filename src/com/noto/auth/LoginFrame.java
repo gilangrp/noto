@@ -1,11 +1,13 @@
+package com.noto.auth;
 import javax.swing.*;
 import javax.swing.border.*;
+
+import com.noto.database.DatabaseManager;
+import com.noto.home.HomeFrame;
+
 import java.awt.*;
 import java.awt.event.*;
 // Removed unused imports: java.awt.geom.RoundRectangle2D
-
-// Import DatabaseManager
-import database.DatabaseManager;
 
 public class LoginFrame extends JFrame {
     private JTextField usernameField;

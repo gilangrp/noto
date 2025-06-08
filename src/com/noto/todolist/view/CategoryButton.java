@@ -1,9 +1,11 @@
-package todolistapp;
+package com.noto.todolist.view;
 
 import javax.swing.*;
+
+import com.noto.database.DatabaseManager;
+
 import java.awt.*;
 import java.awt.event.*;
-import database.DatabaseManager;
 
 /**
  * CategoryButton - A class to add a "Categories" button to the HomeFrame
