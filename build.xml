@@ -36,13 +36,13 @@
         </javac>
         <!-- Copy resources -->
         <copy todir="${build.dir}/resources">
-            <fileset dir="${resources.dir}"/>
+            <fileset dir="${src.dir}/com/noto/resources"/>
         </copy>
-         <copy todir="${build.dir}/database">
+         <!-- <copy todir="${build.dir}/database">
             <fileset dir="${src.dir}/database">
                  <include name="*.sql"/>
             </fileset>
-        </copy>
+        </copy> -->
     </target>
 
     <!-- Target: Create JAR -->
