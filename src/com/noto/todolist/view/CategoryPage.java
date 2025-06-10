@@ -1,14 +1,12 @@
 package com.noto.todolist.view;
 
-import javax.swing.*;
-
 import com.noto.database.DatabaseManager;
 import com.noto.todolist.model.NoteData;
-
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import java.util.List;
+import javax.swing.*;
 
 /**
  * CategoryPage - A page to view and manage note categories
@@ -16,6 +14,7 @@ import java.util.List;
 public class CategoryPage extends JFrame {
     private JPanel mainPanel;
     private JPanel categoriesPanel;
+    private JPanel categoriesContentPanel; // New: separate content panel for scrolling
     private JPanel notesPanel;
     private JList<String> notesList;
     private DefaultListModel<String> notesListModel;
@@ -47,28 +46,42 @@ public class CategoryPage extends JFrame {
         // Main panel with split pane
         mainPanel = new JPanel(new BorderLayout());
         
-        // Categories panel (left side)
-        categoriesPanel = new JPanel();
-        categoriesPanel.setLayout(new BoxLayout(categoriesPanel, BoxLayout.Y_AXIS));
+        // Categories panel (left side) - Fixed header with scrollable content
+        categoriesPanel = new JPanel(new BorderLayout());
         categoriesPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         categoriesPanel.setBackground(new Color(245, 245, 245));
         
-        // Category header
+        // Category header (fixed at top)
         JPanel categoryHeaderPanel = new JPanel(new BorderLayout());
         categoryHeaderPanel.setBackground(categoriesPanel.getBackground());
         JLabel categoryLabel = new JLabel("Categories");
         categoryLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
         categoryHeaderPanel.add(categoryLabel, BorderLayout.WEST);
         
-        // Add category button
+        // Add category button - Made smaller
         JButton addCategoryBtn = new JButton("+");
-        addCategoryBtn.setFont(new Font("SansSerif", Font.BOLD, 16));
+        addCategoryBtn.setFont(new Font("SansSerif", Font.BOLD, 12)); // Reduced font size
+        addCategoryBtn.setPreferredSize(new Dimension(25, 25)); // Set specific size
         addCategoryBtn.setFocusPainted(false);
+        addCategoryBtn.setMargin(new Insets(2, 2, 2, 2)); // Smaller margins
         addCategoryBtn.addActionListener(e -> handleAddCategory());
         categoryHeaderPanel.add(addCategoryBtn, BorderLayout.EAST);
         
-        categoriesPanel.add(categoryHeaderPanel);
-        categoriesPanel.add(Box.createVerticalStrut(10));
+        categoriesPanel.add(categoryHeaderPanel, BorderLayout.NORTH);
+        
+        // Categories content panel (scrollable)
+        categoriesContentPanel = new JPanel();
+        categoriesContentPanel.setLayout(new BoxLayout(categoriesContentPanel, BoxLayout.Y_AXIS));
+        categoriesContentPanel.setBackground(categoriesPanel.getBackground());
+        
+        // Wrap content panel in scroll pane
+        JScrollPane categoriesScrollPane = new JScrollPane(categoriesContentPanel);
+        categoriesScrollPane.setBorder(BorderFactory.createEmptyBorder());
+        categoriesScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        categoriesScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        categoriesScrollPane.getVerticalScrollBar().setUnitIncrement(16); // Smooth scrolling
+        
+        categoriesPanel.add(categoriesScrollPane, BorderLayout.CENTER);
         
         // Notes panel (right side)
         notesPanel = new JPanel(new BorderLayout());
@@ -107,17 +120,11 @@ public class CategoryPage extends JFrame {
         notesLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
         notesHeaderPanel.add(notesLabel, BorderLayout.WEST);
         
-        // Add note button
-//        JButton addNoteBtn = new JButton("New Note");
-//        addNoteBtn.setFocusPainted(false);
-//        addNoteBtn.addActionListener(e -> handleAddNote());
-//        notesHeaderPanel.add(addNoteBtn, BorderLayout.EAST);
-        
         notesPanel.add(notesHeaderPanel, BorderLayout.NORTH);
         notesPanel.add(notesScrollPane, BorderLayout.CENTER);
         
         // Split pane
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(categoriesPanel), notesPanel);
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, categoriesPanel, notesPanel);
         splitPane.setDividerLocation(250);
         splitPane.setOneTouchExpandable(true);
         
@@ -128,31 +135,22 @@ public class CategoryPage extends JFrame {
     }
     
     private void loadCategories() {
-        // Clear existing categories
-        categoriesPanel.removeAll();
+        // Clear existing categories from content panel only
+        categoriesContentPanel.removeAll();
         
-        // Add header back
-        JPanel categoryHeaderPanel = new JPanel(new BorderLayout());
-        categoryHeaderPanel.setBackground(categoriesPanel.getBackground());
-        JLabel categoryLabel = new JLabel("Categories");
-        categoryLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
-        categoryHeaderPanel.add(categoryLabel, BorderLayout.WEST);
-        
-        // Add category button
-        JButton addCategoryBtn = new JButton("+");
-        addCategoryBtn.setFont(new Font("SansSerif", Font.BOLD, 16));
-        addCategoryBtn.setFocusPainted(false);
-        addCategoryBtn.addActionListener(e -> handleAddCategory());
-        categoryHeaderPanel.add(addCategoryBtn, BorderLayout.EAST);
-        
-        categoriesPanel.add(categoryHeaderPanel);
-        categoriesPanel.add(Box.createVerticalStrut(10));
+        // Add spacing at top
+        categoriesContentPanel.add(Box.createVerticalStrut(10));
         
         // Get categories from database
         List<Map<String, Object>> categories = dbManager.getUserCategories(userId);
         
         // Get note counts per category
         Map<Integer, Integer> categoryCounts = dbManager.getCategoryNoteCounts(userId);
+        
+        // Add "All Notes" category first
+        JPanel allNotesPanel = createCategoryPanel("All Notes", new Color(220, 220, 220), -1);
+        categoriesContentPanel.add(allNotesPanel);
+        categoriesContentPanel.add(Box.createVerticalStrut(5));
         
         // Add category buttons
         for (Map<String, Object> category : categories) {
@@ -179,21 +177,16 @@ public class CategoryPage extends JFrame {
             
             // Create category panel
             JPanel categoryPanel = createCategoryPanel(categoryName, color, noteCount);
-            categoriesPanel.add(categoryPanel);
-            categoriesPanel.add(Box.createVerticalStrut(5));
+            categoriesContentPanel.add(categoryPanel);
+            categoriesContentPanel.add(Box.createVerticalStrut(5));
         }
         
-        // Add "All Notes" category
-        JPanel allNotesPanel = createCategoryPanel("All Notes", new Color(220, 220, 220), -1);
-        categoriesPanel.add(allNotesPanel, 2); // Add after header and spacing
-        categoriesPanel.add(Box.createVerticalStrut(5), 3);
-        
         // Add filler to push categories to the top
-        categoriesPanel.add(Box.createVerticalGlue());
+        categoriesContentPanel.add(Box.createVerticalGlue());
         
         // Refresh UI
-        categoriesPanel.revalidate();
-        categoriesPanel.repaint();
+        categoriesContentPanel.revalidate();
+        categoriesContentPanel.repaint();
         
         // Select "All Notes" by default if no category is selected
         if (currentCategory == null) {
@@ -209,6 +202,7 @@ public class CategoryPage extends JFrame {
                 BorderFactory.createLineBorder(color.darker(), 1),
                 BorderFactory.createEmptyBorder(8, 10, 8, 10)
         ));
+        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, panel.getPreferredSize().height));
         
         // Category name label
         JLabel nameLabel = new JLabel(categoryName);
@@ -230,24 +224,26 @@ public class CategoryPage extends JFrame {
         }
         panel.add(labelPanel, BorderLayout.WEST);
         
-        // Add edit/delete buttons for custom categories (not All Notes)
+        // Add edit/delete buttons for custom categories (not All Notes) - Made smaller
         if (!categoryName.equals("All Notes")) {
-            JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
+            JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 2, 0)); // Reduced spacing
             buttonPanel.setBackground(panel.getBackground());
             
-            // Edit button
+            // Edit button - Made smaller
             JButton editBtn = new JButton("✎");
-            editBtn.setFont(new Font("SansSerif", Font.PLAIN, 12));
-            editBtn.setMargin(new Insets(0, 3, 0, 3));
+            editBtn.setFont(new Font("SansSerif", Font.PLAIN, 10)); // Smaller font
+            editBtn.setPreferredSize(new Dimension(20, 20)); // Smaller size
+            editBtn.setMargin(new Insets(1, 1, 1, 1)); // Smaller margins
             editBtn.setFocusPainted(false);
             editBtn.setContentAreaFilled(false);
             editBtn.setBorderPainted(false);
             editBtn.addActionListener(e -> handleEditCategory(categoryName));
             
-            // Delete button
+            // Delete button - Made smaller
             JButton deleteBtn = new JButton("✕");
-            deleteBtn.setFont(new Font("SansSerif", Font.PLAIN, 12));
-            deleteBtn.setMargin(new Insets(0, 3, 0, 3));
+            deleteBtn.setFont(new Font("SansSerif", Font.PLAIN, 10)); // Smaller font
+            deleteBtn.setPreferredSize(new Dimension(20, 20)); // Smaller size
+            deleteBtn.setMargin(new Insets(1, 1, 1, 1)); // Smaller margins
             deleteBtn.setFocusPainted(false);
             deleteBtn.setContentAreaFilled(false);
             deleteBtn.setBorderPainted(false);
@@ -270,14 +266,7 @@ public class CategoryPage extends JFrame {
                 panel.setCursor(new Cursor(Cursor.HAND_CURSOR));
                 if (currentCategory == null || !currentCategory.equals(categoryName)) {
                     panel.setBackground(color.darker());
-                    for (Component c : panel.getComponents()) {
-                        c.setBackground(panel.getBackground());
-                        if (c instanceof JPanel) {
-                            for (Component innerC : ((JPanel) c).getComponents()) {
-                                innerC.setBackground(panel.getBackground());
-                            }
-                        }
-                    }
+                    updatePanelBackground(panel, panel.getBackground());
                 }
             }
             
@@ -286,19 +275,22 @@ public class CategoryPage extends JFrame {
                 panel.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 if (currentCategory == null || !currentCategory.equals(categoryName)) {
                     panel.setBackground(color);
-                    for (Component c : panel.getComponents()) {
-                        c.setBackground(panel.getBackground());
-                        if (c instanceof JPanel) {
-                            for (Component innerC : ((JPanel) c).getComponents()) {
-                                innerC.setBackground(panel.getBackground());
-                            }
-                        }
-                    }
+                    updatePanelBackground(panel, panel.getBackground());
                 }
             }
         });
         
         return panel;
+    }
+    
+    // Helper method to update panel background recursively
+    private void updatePanelBackground(Container container, Color background) {
+        for (Component c : container.getComponents()) {
+            c.setBackground(background);
+            if (c instanceof Container) {
+                updatePanelBackground((Container) c, background);
+            }
+        }
     }
     
     private void selectCategory(String categoryName) {
