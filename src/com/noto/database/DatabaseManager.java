@@ -16,20 +16,21 @@ import com.noto.todolist.model.TodoItem;
  * Database manager for handling all database operations using MySQL.
  */
 public class DatabaseManager {
-    // --- MySQL Configuration --- 
+    // --- MySQL Configuration ---
     private static final String DB_HOST = "localhost";
     private static final String DB_PORT = "3306";
-    private static final String DB_NAME = "todolist_db"; 
+    private static final String DB_NAME = "todolist_db";
     private static final String DB_USER = "root"; // Default MySQL username for testing
     private static final String DB_PASSWORD = ""; // Empty password for testing
-    private static final String DB_URL = "jdbc:mysql://" + DB_HOST + ":" + DB_PORT + "/" + DB_NAME + "?user=" + DB_USER + "&password=" + DB_PASSWORD + "&serverTimezone=UTC&createDatabaseIfNotExist=true";
+    private static final String DB_URL = "jdbc:mysql://" + DB_HOST + ":" + DB_PORT + "/" + DB_NAME + "?user=" + DB_USER
+            + "&password=" + DB_PASSWORD + "&serverTimezone=UTC&createDatabaseIfNotExist=true";
     // --- End MySQL Configuration ---
 
-    private static final String SCHEMA_FILE = "src/database/TodoList_mysql.sql"; 
-    
+    private static final String SCHEMA_FILE = "src/database/TodoList_mysql.sql";
+
     private static DatabaseManager instance;
     private Connection connection;
-    
+
     private DatabaseManager() {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -45,7 +46,7 @@ public class DatabaseManager {
             System.err.println("VendorError: " + e.getErrorCode());
         }
     }
-    
+
     public static synchronized DatabaseManager getInstance() {
         if (instance == null) {
             instance = new DatabaseManager();
@@ -56,12 +57,12 @@ public class DatabaseManager {
                 instance = new DatabaseManager();
             }
         } catch (SQLException e) {
-             System.err.println("Error checking database connection status: " + e.getMessage());
-             instance = new DatabaseManager();
+            System.err.println("Error checking database connection status: " + e.getMessage());
+            instance = new DatabaseManager();
         }
         return instance;
     }
-    
+
     private void initializeDatabase() {
         if (tablesExist("users")) { // Check for a core table
             System.out.println("Core database tables already exist. Checking for notes tables...");
@@ -77,18 +78,20 @@ public class DatabaseManager {
         System.out.println("Initializing database schema from: " + SCHEMA_FILE);
         executeSchemaScript(SCHEMA_FILE);
     }
-    
+
     // Helper to execute SQL statements from a file (basic version)
     private void executeSchemaScript(String filePath) {
-         try {
+        try {
             String schema = new String(Files.readAllBytes(Paths.get(filePath)));
-            String[] statements = schema.split(";(?=(?:[^\\\"]*\\\"[^\\\"]*\\\")*[^\\\"]*$)" ); // Basic split handling double quotes
-            
+            String[] statements = schema.split(";(?=(?:[^\\\"]*\\\"[^\\\"]*\\\")*[^\\\"]*$)"); // Basic split handling
+                                                                                               // double quotes
+
             try (Statement stmt = connection.createStatement()) {
-                 for (String statement : statements) {
+                for (String statement : statements) {
                     String trimmedStatement = statement.trim();
                     if (!trimmedStatement.isEmpty()) {
-                        System.out.println("Executing Schema: " + trimmedStatement.substring(0, Math.min(trimmedStatement.length(), 100)) + "...");
+                        System.out.println("Executing Schema: "
+                                + trimmedStatement.substring(0, Math.min(trimmedStatement.length(), 100)) + "...");
                         stmt.execute(trimmedStatement);
                     }
                 }
@@ -103,13 +106,13 @@ public class DatabaseManager {
 
     private boolean tablesExist(String tableName) {
         try (ResultSet rs = connection.getMetaData().getTables(null, null, tableName, null)) {
-            return rs.next(); 
+            return rs.next();
         } catch (SQLException e) {
             System.err.println("Error checking if table \t" + tableName + "\t exists: " + e.getMessage());
             return false;
         }
     }
-    
+
     public void closeConnection() {
         try {
             if (connection != null && !connection.isClosed()) {
@@ -120,8 +123,8 @@ public class DatabaseManager {
             System.err.println("Error closing MySQL database connection: " + e.getMessage());
         }
     }
-    
-    // --- User Management (Existing Methods - check for correctness) --- 
+
+    // --- User Management (Existing Methods - check for correctness) ---
     public boolean registerUser(String fullName, String email, String username, String password) {
         String sql = "INSERT INTO users (full_name, email, username, password) VALUES (?, ?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -131,9 +134,10 @@ public class DatabaseManager {
             pstmt.setString(4, password); // HASHING IS CRITICAL
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
-                 int userId = getUserIdByUsername(username);
-                 if (userId > 0) createDefaultSettings(userId); 
-                 return true;
+                int userId = getUserIdByUsername(username);
+                if (userId > 0)
+                    createDefaultSettings(userId);
+                return true;
             }
             return false;
         } catch (SQLException e) {
@@ -208,7 +212,7 @@ public class DatabaseManager {
         return "";
     }
 
-     private int getUserIdByUsername(String username) {
+    private int getUserIdByUsername(String username) {
         String sql = "SELECT user_id FROM users WHERE username = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, username);
@@ -222,13 +226,13 @@ public class DatabaseManager {
         return -1;
     }
 
-    // --- Todo Item Management (Existing Methods) --- 
+    // --- Todo Item Management (Existing Methods) ---
     public ResultSet getUserTodoItems(int userId) {
         String sql = "SELECT * FROM todo_items WHERE user_id = ? ORDER BY priority DESC, created_at DESC";
         try {
             PreparedStatement pstmt = connection.prepareStatement(sql);
             pstmt.setInt(1, userId);
-            return pstmt.executeQuery(); 
+            return pstmt.executeQuery();
         } catch (SQLException e) {
             System.err.println("Error getting user todo items: " + e.getMessage());
             return null;
@@ -261,7 +265,7 @@ public class DatabaseManager {
         }
     }
 
-    // --- Settings Management (Existing Methods) --- 
+    // --- Settings Management (Existing Methods) ---
     public ResultSet getUserSettings(int userId) {
         String sql = "SELECT * FROM user_settings WHERE user_id = ?";
         try {
@@ -276,9 +280,9 @@ public class DatabaseManager {
 
     public void createDefaultSettings(int userId) {
         String sql = "INSERT IGNORE INTO user_settings (user_id) VALUES (?)";
-        if (userId <= 0) { 
-             System.err.println("Attempted to create settings for invalid userId: " + userId);
-             return;
+        if (userId <= 0) {
+            System.err.println("Attempted to create settings for invalid userId: " + userId);
+            return;
         }
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, userId);
@@ -317,20 +321,20 @@ public class DatabaseManager {
             return false;
         }
     }
-    
+
     // --- Category Management (New Methods) ---
-    
+
     /**
      * Gets all categories for a user.
      */
     public List<Map<String, Object>> getUserCategories(int userId) {
         List<Map<String, Object>> categories = new ArrayList<>();
         String sql = "SELECT category_id, name, color FROM note_categories WHERE user_id = ? ORDER BY name ASC";
-        
+
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, userId);
             ResultSet rs = pstmt.executeQuery();
-            
+
             while (rs.next()) {
                 Map<String, Object> category = new HashMap<>();
                 category.put("id", rs.getInt("category_id"));
@@ -342,10 +346,10 @@ public class DatabaseManager {
         } catch (SQLException e) {
             System.err.println("Error getting user categories: " + e.getMessage());
         }
-        
+
         return categories;
     }
-    
+
     /**
      * Gets a category ID by name, creating it if it doesn't exist.
      */
@@ -353,10 +357,10 @@ public class DatabaseManager {
         if (categoryName == null || categoryName.trim().isEmpty()) {
             categoryName = "Uncategorized";
         }
-        
+
         String selectSql = "SELECT category_id FROM note_categories WHERE user_id = ? AND name = ?";
         String insertSql = "INSERT INTO note_categories (user_id, name) VALUES (?, ?)";
-        
+
         try {
             // First try to find existing category
             try (PreparedStatement pstmt = connection.prepareStatement(selectSql)) {
@@ -367,13 +371,13 @@ public class DatabaseManager {
                     return rs.getInt("category_id");
                 }
             }
-            
+
             // If not found, create new category
             try (PreparedStatement pstmt = connection.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS)) {
                 pstmt.setInt(1, userId);
                 pstmt.setString(2, categoryName);
                 int affectedRows = pstmt.executeUpdate();
-                
+
                 if (affectedRows > 0) {
                     try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
                         if (generatedKeys.next()) {
@@ -387,10 +391,10 @@ public class DatabaseManager {
         } catch (SQLException e) {
             System.err.println("Error getting/creating category: " + e.getMessage());
         }
-        
+
         return -1; // Failed to get or create category
     }
-    
+
     /**
      * Creates a new category for a user.
      */
@@ -399,14 +403,14 @@ public class DatabaseManager {
             System.err.println("Cannot create category with empty name");
             return -1;
         }
-        
+
         String sql = "INSERT INTO note_categories (user_id, name, color) VALUES (?, ?, ?)";
-        
+
         try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setInt(1, userId);
             pstmt.setString(2, name);
             pstmt.setString(3, color != null ? color : "#FFFFFF");
-            
+
             int affectedRows = pstmt.executeUpdate();
             if (affectedRows > 0) {
                 try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
@@ -420,10 +424,10 @@ public class DatabaseManager {
         } catch (SQLException e) {
             System.err.println("Error creating category: " + e.getMessage());
         }
-        
+
         return -1;
     }
-    
+
     /**
      * Updates an existing category.
      */
@@ -432,14 +436,14 @@ public class DatabaseManager {
             System.err.println("Cannot update category with empty name");
             return false;
         }
-        
+
         String sql = "UPDATE note_categories SET name = ?, color = ? WHERE category_id = ?";
-        
+
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, name);
             pstmt.setString(2, color != null ? color : "#FFFFFF");
             pstmt.setInt(3, categoryId);
-            
+
             int affectedRows = pstmt.executeUpdate();
             boolean success = affectedRows > 0;
             if (success) {
@@ -453,7 +457,7 @@ public class DatabaseManager {
             return false;
         }
     }
-    
+
     /**
      * Deletes a category and updates all notes in that category to Uncategorized.
      */
@@ -464,35 +468,35 @@ public class DatabaseManager {
             System.err.println("Failed to get/create Uncategorized category");
             return false;
         }
-        
+
         // Don't allow deleting the Uncategorized category
         if (categoryId == uncategorizedId) {
             System.err.println("Cannot delete the Uncategorized category");
             return false;
         }
-        
+
         Connection conn = this.connection;
         PreparedStatement psUpdateNotes = null;
         PreparedStatement psDeleteCategory = null;
         boolean success = false;
-        
+
         try {
             conn.setAutoCommit(false); // Start transaction
-            
+
             // Update notes to use Uncategorized category
             String updateNotesSql = "UPDATE notes SET category_id = ? WHERE category_id = ?";
             psUpdateNotes = conn.prepareStatement(updateNotesSql);
             psUpdateNotes.setInt(1, uncategorizedId);
             psUpdateNotes.setInt(2, categoryId);
             psUpdateNotes.executeUpdate();
-            
+
             // Delete the category
             String deleteCategorySql = "DELETE FROM note_categories WHERE category_id = ? AND user_id = ?";
             psDeleteCategory = conn.prepareStatement(deleteCategorySql);
             psDeleteCategory.setInt(1, categoryId);
             psDeleteCategory.setInt(2, userId);
             int affectedRows = psDeleteCategory.executeUpdate();
-            
+
             if (affectedRows > 0) {
                 conn.commit();
                 success = true;
@@ -502,28 +506,45 @@ public class DatabaseManager {
                 System.err.println("No category found with ID: " + categoryId + " for user ID: " + userId);
             }
         } catch (SQLException e) {
-            try { if (conn != null) conn.rollback(); } catch (SQLException se) { se.printStackTrace(); }
+            try {
+                if (conn != null)
+                    conn.rollback();
+            } catch (SQLException se) {
+                se.printStackTrace();
+            }
             System.err.println("Error deleting category: " + e.getMessage());
         } finally {
-            try { if (psUpdateNotes != null) psUpdateNotes.close(); } catch (SQLException se) { /* ignore */ }
-            try { if (psDeleteCategory != null) psDeleteCategory.close(); } catch (SQLException se) { /* ignore */ }
-            try { if (conn != null) conn.setAutoCommit(true); } catch (SQLException se) { /* ignore */ }
+            try {
+                if (psUpdateNotes != null)
+                    psUpdateNotes.close();
+            } catch (SQLException se) {
+                /* ignore */ }
+            try {
+                if (psDeleteCategory != null)
+                    psDeleteCategory.close();
+            } catch (SQLException se) {
+                /* ignore */ }
+            try {
+                if (conn != null)
+                    conn.setAutoCommit(true);
+            } catch (SQLException se) {
+                /* ignore */ }
         }
-        
+
         return success;
     }
-    
+
     /**
      * Gets the count of notes in each category for a user.
      */
     public Map<Integer, Integer> getCategoryNoteCounts(int userId) {
         Map<Integer, Integer> counts = new HashMap<>();
         String sql = "SELECT category_id, COUNT(*) as count FROM notes WHERE user_id = ? GROUP BY category_id";
-        
+
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, userId);
             ResultSet rs = pstmt.executeQuery();
-            
+
             while (rs.next()) {
                 int categoryId = rs.getInt("category_id");
                 int count = rs.getInt("count");
@@ -532,12 +553,12 @@ public class DatabaseManager {
         } catch (SQLException e) {
             System.err.println("Error getting category note counts: " + e.getMessage());
         }
-        
+
         return counts;
     }
-    
+
     // --- Notes & Note_Todos Management (Updated for Categories) ---
-    
+
     /**
      * Saves or updates a note and its associated todo items.
      * Uses a transaction to ensure atomicity.
@@ -548,20 +569,20 @@ public class DatabaseManager {
             System.err.println("Cannot save note with empty title");
             return false;
         }
-        
+
         // Get or create the category
         int categoryId = getCategoryIdByName(userId, data.category);
         if (categoryId == -1) {
             System.err.println("Failed to get/create category: " + data.category);
             return false;
         }
-        
+
         String upsertNoteSQL = "INSERT INTO notes (user_id, category_id, title, content) VALUES (?, ?, ?, ?) " +
-                               "ON DUPLICATE KEY UPDATE content = VALUES(content), category_id = VALUES(category_id), updated_at = CURRENT_TIMESTAMP";
+                "ON DUPLICATE KEY UPDATE content = VALUES(content), category_id = VALUES(category_id), updated_at = CURRENT_TIMESTAMP";
         String selectNoteIdSQL = "SELECT note_id FROM notes WHERE user_id = ? AND title = ?";
         String deleteTodosSQL = "DELETE FROM note_todos WHERE note_id = ?";
         String insertTodoSQL = "INSERT INTO note_todos (note_id, description, completed) VALUES (?, ?, ?)";
-        
+
         Connection conn = this.connection; // Use the managed connection
         PreparedStatement psUpsertNote = null;
         PreparedStatement psSelectNoteId = null;
@@ -593,18 +614,19 @@ public class DatabaseManager {
                     System.out.println("Inserted new note with ID: " + noteId);
                 }
             } else { // Row was updated or no change, fetch existing ID
-                 psSelectNoteId.setInt(1, userId);
-                 psSelectNoteId.setString(2, title);
-                 ResultSet rs = psSelectNoteId.executeQuery();
-                 if (rs.next()) {
-                     noteId = rs.getInt("note_id");
-                     System.out.println("Found existing note with ID: " + noteId);
-                 }
-                 if (rs != null) rs.close();
+                psSelectNoteId.setInt(1, userId);
+                psSelectNoteId.setString(2, title);
+                ResultSet rs = psSelectNoteId.executeQuery();
+                if (rs.next()) {
+                    noteId = rs.getInt("note_id");
+                    System.out.println("Found existing note with ID: " + noteId);
+                }
+                if (rs != null)
+                    rs.close();
             }
-            
+
             if (noteId == -1) {
-                 throw new SQLException("Failed to get note_id for title: " + title);
+                throw new SQLException("Failed to get note_id for title: " + title);
             }
 
             // Delete existing todos for this note
@@ -623,7 +645,7 @@ public class DatabaseManager {
                     todoCount++;
                 }
             }
-            
+
             if (todoCount > 0) {
                 int[] batchResults = psInsertTodo.executeBatch();
                 System.out.println("Inserted " + batchResults.length + " todo items for note ID: " + noteId);
@@ -635,54 +657,75 @@ public class DatabaseManager {
 
         } catch (SQLException e) {
             e.printStackTrace();
-            try { 
+            try {
                 if (conn != null) {
                     conn.rollback();
                     System.err.println("Transaction rolled back due to error");
                 }
-            } catch (SQLException se) { 
-                se.printStackTrace(); 
+            } catch (SQLException se) {
+                se.printStackTrace();
             }
             System.err.println("Error saving note and todos: " + e.getMessage());
         } finally {
             // Clean up resources
-            try { if (generatedKeys != null) generatedKeys.close(); } catch (SQLException se) { /* ignore */ }
-            try { if (psUpsertNote != null) psUpsertNote.close(); } catch (SQLException se) { /* ignore */ }
-            try { if (psSelectNoteId != null) psSelectNoteId.close(); } catch (SQLException se) { /* ignore */ }
-            try { if (psDeleteTodos != null) psDeleteTodos.close(); } catch (SQLException se) { /* ignore */ }
-            try { if (psInsertTodo != null) psInsertTodo.close(); } catch (SQLException se) { /* ignore */ }
-            try { 
+            try {
+                if (generatedKeys != null)
+                    generatedKeys.close();
+            } catch (SQLException se) {
+                /* ignore */ }
+            try {
+                if (psUpsertNote != null)
+                    psUpsertNote.close();
+            } catch (SQLException se) {
+                /* ignore */ }
+            try {
+                if (psSelectNoteId != null)
+                    psSelectNoteId.close();
+            } catch (SQLException se) {
+                /* ignore */ }
+            try {
+                if (psDeleteTodos != null)
+                    psDeleteTodos.close();
+            } catch (SQLException se) {
+                /* ignore */ }
+            try {
+                if (psInsertTodo != null)
+                    psInsertTodo.close();
+            } catch (SQLException se) {
+                /* ignore */ }
+            try {
                 if (conn != null) {
                     conn.setAutoCommit(true); // Restore auto-commit
                     System.out.println("Auto-commit restored");
                 }
-            } catch (SQLException se) { /* ignore */ } 
+            } catch (SQLException se) {
+                /* ignore */ }
         }
         return success;
     }
 
     public boolean deleteNote(int userId, String title) {
-         if (title == null || title.trim().isEmpty()) {
-             System.err.println("Cannot delete note with empty title");
-             return false;
-         }
-         
-         String deleteNoteSQL = "DELETE FROM notes WHERE user_id = ? AND title = ?";
-         try (PreparedStatement psDeleteNote = connection.prepareStatement(deleteNoteSQL)) {
-             psDeleteNote.setInt(1, userId);
-             psDeleteNote.setString(2, title);
-             int affectedRows = psDeleteNote.executeUpdate();
-             boolean success = affectedRows > 0;
-             if (success) {
-                 System.out.println("Successfully deleted note with title: " + title + " for user ID: " + userId);
-             } else {
-                 System.err.println("No note found to delete with title: " + title + " for user ID: " + userId);
-             }
-             return success;
-         } catch (SQLException e) {
-             System.err.println("Error deleting note: " + e.getMessage());
-             return false;
-         }
+        if (title == null || title.trim().isEmpty()) {
+            System.err.println("Cannot delete note with empty title");
+            return false;
+        }
+
+        String deleteNoteSQL = "DELETE FROM notes WHERE user_id = ? AND title = ?";
+        try (PreparedStatement psDeleteNote = connection.prepareStatement(deleteNoteSQL)) {
+            psDeleteNote.setInt(1, userId);
+            psDeleteNote.setString(2, title);
+            int affectedRows = psDeleteNote.executeUpdate();
+            boolean success = affectedRows > 0;
+            if (success) {
+                System.out.println("Successfully deleted note with title: " + title + " for user ID: " + userId);
+            } else {
+                System.err.println("No note found to delete with title: " + title + " for user ID: " + userId);
+            }
+            return success;
+        } catch (SQLException e) {
+            System.err.println("Error deleting note: " + e.getMessage());
+            return false;
+        }
     }
 
     /**
@@ -692,10 +735,10 @@ public class DatabaseManager {
     public Map<String, NoteData> loadNotes(int userId) {
         Map<String, NoteData> notesMap = new HashMap<>();
         String selectNotesSQL = "SELECT n.note_id, n.title, n.content, c.name as category_name " +
-                               "FROM notes n " +
-                               "LEFT JOIN note_categories c ON n.category_id = c.category_id " +
-                               "WHERE n.user_id = ? " +
-                               "ORDER BY n.title ASC";
+                "FROM notes n " +
+                "LEFT JOIN note_categories c ON n.category_id = c.category_id " +
+                "WHERE n.user_id = ? " +
+                "ORDER BY n.title ASC";
         String selectTodosSQL = "SELECT description, completed FROM note_todos WHERE note_id = ?";
 
         try (PreparedStatement psNotes = connection.prepareStatement(selectNotesSQL)) {
@@ -707,7 +750,7 @@ public class DatabaseManager {
                 String title = rsNotes.getString("title");
                 String content = rsNotes.getString("content");
                 String category = rsNotes.getString("category_name");
-                
+
                 // If category is null, use "Uncategorized"
                 if (category == null) {
                     category = "Uncategorized";
@@ -731,25 +774,26 @@ public class DatabaseManager {
 
                 notesMap.put(title, data);
             }
-             if (rsNotes != null) rsNotes.close();
-             System.out.println("Loaded " + notesMap.size() + " notes for user ID: " + userId);
+            if (rsNotes != null)
+                rsNotes.close();
+            System.out.println("Loaded " + notesMap.size() + " notes for user ID: " + userId);
         } catch (SQLException e) {
             System.err.println("Error loading notes: " + e.getMessage());
             // Return empty map on error
         }
         return notesMap;
     }
-    
+
     /**
      * Loads notes for a specific category.
      */
     public Map<String, NoteData> loadNotesByCategory(int userId, String categoryName) {
         Map<String, NoteData> notesMap = new HashMap<>();
         String selectNotesSQL = "SELECT n.note_id, n.title, n.content, c.name as category_name " +
-                               "FROM notes n " +
-                               "LEFT JOIN note_categories c ON n.category_id = c.category_id " +
-                               "WHERE n.user_id = ? AND c.name = ? " +
-                               "ORDER BY n.title ASC";
+                "FROM notes n " +
+                "LEFT JOIN note_categories c ON n.category_id = c.category_id " +
+                "WHERE n.user_id = ? AND c.name = ? " +
+                "ORDER BY n.title ASC";
         String selectTodosSQL = "SELECT description, completed FROM note_todos WHERE note_id = ?";
 
         try (PreparedStatement psNotes = connection.prepareStatement(selectNotesSQL)) {
@@ -762,7 +806,7 @@ public class DatabaseManager {
                 String title = rsNotes.getString("title");
                 String content = rsNotes.getString("content");
                 String category = rsNotes.getString("category_name");
-                
+
                 // If category is null, use "Uncategorized"
                 if (category == null) {
                     category = "Uncategorized";
@@ -786,17 +830,19 @@ public class DatabaseManager {
 
                 notesMap.put(title, data);
             }
-             if (rsNotes != null) rsNotes.close();
-             System.out.println("Loaded " + notesMap.size() + " notes for category '" + categoryName + "' and user ID: " + userId);
+            if (rsNotes != null)
+                rsNotes.close();
+            System.out.println(
+                    "Loaded " + notesMap.size() + " notes for category '" + categoryName + "' and user ID: " + userId);
         } catch (SQLException e) {
             System.err.println("Error loading notes by category: " + e.getMessage());
             // Return empty map on error
         }
         return notesMap;
     }
-    
+
     // --- Dashboard Data Methods (New) ---
-    
+
     /**
      * Gets task counts (total, completed, pending) for a user.
      */
@@ -805,50 +851,62 @@ public class DatabaseManager {
         counts.put("total", 0);
         counts.put("completed", 0);
         counts.put("pending", 0);
-        
-        String countSql = "SELECT status, COUNT(*) as count FROM todo_items WHERE user_id = ? GROUP BY status";
+
+        // Karena tidak ada user_id di note_todos, saya asumsikan user_id bisa di-join
+        // lewat notes table
+        // atau note_id yang terkait ke user.
+        // Kalau kamu memang punya table `notes` yang punya `user_id`, kita bisa JOIN.
+
+        String countSql = "SELECT " +
+                "    COUNT(*) AS total, " +
+                "    SUM(CASE WHEN completed = 1 THEN 1 ELSE 0 END) AS completed, " +
+                "    SUM(CASE WHEN completed = 0 THEN 1 ELSE 0 END) AS pending " +
+                "FROM note_todos nt " +
+                "JOIN notes n ON nt.note_id = n.note_id " + // asumsi notes punya user_id
+                "WHERE n.user_id = ?";
+
         try (PreparedStatement psCount = connection.prepareStatement(countSql)) {
             psCount.setInt(1, userId);
             ResultSet rsCount = psCount.executeQuery();
-            int total = 0;
-            int completed = 0;
-            int pending = 0;
-            while (rsCount.next()) {
-                String status = rsCount.getString("status");
-                int count = rsCount.getInt("count");
-                total += count;
-                if ("completed".equalsIgnoreCase(status)) {
-                    completed = count;
-                } else {
-                    pending += count; 
-                }
+            if (rsCount.next()) {
+                int total = rsCount.getInt("total");
+                int completed = rsCount.getInt("completed");
+                int pending = rsCount.getInt("pending");
+
+                counts.put("total", total);
+                counts.put("completed", completed);
+                counts.put("pending", pending);
             }
-            counts.put("total", total);
-            counts.put("completed", completed);
-            counts.put("pending", pending);
         } catch (SQLException e) {
-             System.err.println("Error getting task counts: " + e.getMessage());
-             // Return zero counts on error
+            System.err.println("Error getting task counts: " + e.getMessage());
+            // Return zero counts on error
         }
         return counts;
     }
-    
+
     /**
-     * Gets a list of pending task titles and priorities for the dashboard notification panel.
+     * Gets a list of pending task titles and priorities for the dashboard
+     * notification panel.
      */
     public List<String> getPendingTaskNotifications(int userId, int limit) {
         List<String> notifications = new ArrayList<>();
-        String pendingSql = "SELECT title, priority FROM todo_items WHERE user_id = ? AND status != ? ORDER BY priority DESC, created_at ASC LIMIT ?";
+
+        String pendingSql = "SELECT nt.description " +
+                "FROM note_todos nt " +
+                "JOIN notes n ON nt.note_id = n.note_id " + // asumsi notes punya user_id
+                "WHERE n.user_id = ? AND nt.completed = 0 " +
+                "ORDER BY nt.todo_id ASC " +
+                "LIMIT ?";
+
         try (PreparedStatement psPending = connection.prepareStatement(pendingSql)) {
             psPending.setInt(1, userId);
-            psPending.setString(2, "completed");
-            psPending.setInt(3, limit);
+            psPending.setInt(2, limit);
+
             ResultSet rsPending = psPending.executeQuery();
             while (rsPending.next()) {
-                String title = rsPending.getString("title");
-                int priority = rsPending.getInt("priority");
-                String priorityText = (priority == 2) ? "(High)" : (priority == 1) ? "(Medium)" : "(Low)";
-                notifications.add("- " + title + " " + priorityText);
+                String description = rsPending.getString("description");
+                // Tidak pakai priority, cukup tampilkan description
+                notifications.add("- " + description);
             }
         } catch (SQLException e) {
             System.err.println("Error getting pending task notifications: " + e.getMessage());
@@ -856,4 +914,5 @@ public class DatabaseManager {
         }
         return notifications;
     }
+
 }
