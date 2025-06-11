@@ -1,5 +1,5 @@
-<project name="ToDoList" default="jar" basedir=".">
-    <description>Builds the ToDoList application.</description>
+<project name="Noto" default="jar" basedir=".">
+    <description>Builds the Noto application.</description>
 
     <!-- Define properties -->
     <property name="src.dir" location="src"/>
@@ -8,7 +8,7 @@
     <property name="lib.dir" location="lib"/>
     <property name="resources.dir" location="${src.dir}/resources"/>
     <property name="main.class" value="Main"/>
-    <property name="jar.name" value="ToDoList.jar"/>
+    <property name="jar.name" value="Noto.jar"/>
 
     <!-- Define classpath -->
     <path id="project.classpath">
