@@ -42,6 +42,7 @@ public class PomodoroController {
         this.view.addPauseButtonListener(new PauseButtonListener());
         this.view.addResetButtonListener(new ResetButtonListener());
         this.view.addPresetComboBoxListener(new PresetComboBoxListener());
+        this.view.addApplyCustomSettingsListener(new ApplyCustomSettingsListener());
 
         // Initial view setup
         updateView();
@@ -182,10 +183,73 @@ public class PomodoroController {
         public void actionPerformed(ActionEvent e) {
             swingTimer.stop();
             String selectedPreset = view.getSelectedPreset();
-            config.loadPreset(selectedPreset);
-            state.resetToFocus(config); // Reset state completely based on new config
-            updateView();
+            
+            if ("Custom".equals(selectedPreset)) {
+                // Show custom panel and set current values
+                view.setCustomValues(
+                    config.getFocusDuration() / 60,
+                    config.getShortBreakDuration() / 60,
+                    config.getLongBreakDuration() / 60,
+                    config.getCyclesBeforeLongBreak()
+                );
+                view.showCustomPanel(true);
+            } else {
+                // Hide custom panel and load preset
+                view.showCustomPanel(false);
+                config.loadPreset(selectedPreset);
+                state.resetToFocus(config); // Reset state completely based on new config
+                updateView();
+            }
+        }
+    }
+
+    class ApplyCustomSettingsListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                // Get custom values from view
+                int focusMinutes = view.getCustomFocusDuration();
+                int shortBreakMinutes = view.getCustomShortBreakDuration();
+                int longBreakMinutes = view.getCustomLongBreakDuration();
+                int cycles = view.getCustomCycles();
+
+                // Validate input
+                if (focusMinutes < 1 || shortBreakMinutes < 1 || longBreakMinutes < 1 || cycles < 1) {
+                    JOptionPane.showMessageDialog(view, 
+                        "Semua nilai harus lebih besar dari 0!", 
+                        "Input Tidak Valid", 
+                        JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                // Stop timer if running
+                swingTimer.stop();
+                
+                // Apply custom configuration
+                config.setCustomConfig(focusMinutes, shortBreakMinutes, longBreakMinutes, cycles);
+                
+                // Reset state to focus with new configuration
+                state.resetToFocus(config);
+                
+                // Update view
+                updateView();
+                
+                // Show confirmation
+                JOptionPane.showMessageDialog(view, 
+                    "Pengaturan custom berhasil diterapkan!\n" +
+                    "Fokus: " + focusMinutes + " menit\n" +
+                    "Istirahat Singkat: " + shortBreakMinutes + " menit\n" +
+                    "Istirahat Panjang: " + longBreakMinutes + " menit\n" +
+                    "Siklus: " + cycles, 
+                    "Pengaturan Diterapkan", 
+                    JOptionPane.INFORMATION_MESSAGE);
+                    
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(view, 
+                    "Terjadi kesalahan saat menerapkan pengaturan: " + ex.getMessage(), 
+                    "Error", 
+                    JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 }
-

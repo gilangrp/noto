@@ -10,8 +10,6 @@ public class PomodoroConfig {
     private int longBreakDuration = 15 * 60;
     private int cyclesBeforeLongBreak = 4;
 
-    // TODO: Add constructors, getters, setters, and preset loading logic
-
     public int getFocusDuration() {
         return focusDuration;
     }
@@ -44,6 +42,14 @@ public class PomodoroConfig {
         this.cyclesBeforeLongBreak = cyclesBeforeLongBreak;
     }
     
+    // Method to set custom configuration
+    public void setCustomConfig(int focusMinutes, int shortBreakMinutes, int longBreakMinutes, int cycles) {
+        this.focusDuration = focusMinutes * 60;
+        this.shortBreakDuration = shortBreakMinutes * 60;
+        this.longBreakDuration = longBreakMinutes * 60;
+        this.cyclesBeforeLongBreak = cycles;
+    }
+    
     // Example preset loading (can be expanded)
     public void loadPreset(String presetName) {
         switch (presetName.toLowerCase()) {
@@ -61,17 +67,19 @@ public class PomodoroConfig {
                 break;
             case "membaca":
                 this.focusDuration = 30 * 60;
-                this.shortBreakDuration = 10 * 60;
+                this.shortBreakDuration = 7 * 60;
                 this.longBreakDuration = 20 * 60;
-                this.cyclesBeforeLongBreak = 3;
-                break;
-            case "menulis":
-                this.focusDuration = 20 * 60;
-                this.shortBreakDuration = 5 * 60;
-                this.longBreakDuration = 15 * 60;
                 this.cyclesBeforeLongBreak = 4;
                 break;
-            // Add more presets as needed
+            case "menulis":
+                this.focusDuration = 50 * 60;
+                this.shortBreakDuration = 10 * 60;
+                this.longBreakDuration = 25 * 60;
+                this.cyclesBeforeLongBreak = 3;
+                break;
+            case "custom":
+                // For custom, don't change values - they should be set via setCustomConfig
+                break;
             default:
                 // Default Pomodoro
                 this.focusDuration = 25 * 60;
@@ -82,4 +90,3 @@ public class PomodoroConfig {
         }
     }
 }
-
