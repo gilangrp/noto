@@ -92,12 +92,22 @@ public class PomodoroController {
     // Method to play the sound
     private void playSound() {
         try {
-            // Get the sound file from resources
-            URL soundURL = getClass().getResource("/sounds/timer_alarm.wav");
+            // Try to load from classpath (for JAR and IDE)
+            URL soundURL = getClass().getResource("/com/noto/resources/sounds/timer_alarm.wav");
             if (soundURL == null) {
-                System.err.println("Sound file not found: /sounds/timer_alarm.wav");
-                // Fallback to beep if file not found
-                java.awt.Toolkit.getDefaultToolkit().beep(); 
+                // Try alternative path (for development)
+                soundURL = getClass().getResource("/sounds/timer_alarm.wav");
+            }
+            if (soundURL == null) {
+                // Try loading from file system (for dev/testing)
+                java.io.File file = new java.io.File("src/com/noto/resources/sounds/timer_alarm.wav");
+                if (file.exists()) {
+                    soundURL = file.toURI().toURL();
+                }
+            }
+            if (soundURL == null) {
+                System.err.println("Sound file not found: timer_alarm.wav");
+                java.awt.Toolkit.getDefaultToolkit().beep();
                 return;
             }
             AudioInputStream audioIn = AudioSystem.getAudioInputStream(soundURL);
@@ -106,8 +116,7 @@ public class PomodoroController {
             clip.start();
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
             System.err.println("Error playing sound: " + e.getMessage());
-            // Fallback to beep on error
-            java.awt.Toolkit.getDefaultToolkit().beep(); 
+            java.awt.Toolkit.getDefaultToolkit().beep();
             e.printStackTrace();
         }
     }
