@@ -30,7 +30,7 @@ public class LoginFrame extends JFrame {
         applyGlobalStyles();
         
         // Set up the frame
-        setTitle("Login - ToDoList App");
+        setTitle("Login - Noto App");
         setSize(400, 350); // Adjusted size for simpler layout
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null); // Center on screen

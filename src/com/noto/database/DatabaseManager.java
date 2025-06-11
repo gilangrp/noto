@@ -15,7 +15,7 @@ import com.noto.todolist.model.TodoItem;
 /**
  * Database manager for handling all database operations using MySQL.
  */
-public class DatabaseManager {
+public class DatabaseManager implements IDatabaseManager {
     // --- MySQL Configuration ---
     private static final String DB_HOST = "localhost";
     private static final String DB_PORT = "3306";

@@ -42,7 +42,7 @@ CREATE TABLE `notes` (
 --
 
 INSERT INTO `notes` (`note_id`, `user_id`, `title`, `content`, `created_at`, `updated_at`, `category_id`) VALUES
-(10, 2, 'koko', 'test', '2025-06-10 08:58:19', '2025-06-10 08:58:19', 5),
+(10, 2, 'PBO Pertemuan 5', 'hari ini belajar inheritance.', '2025-06-10 08:58:19', '2025-06-10 08:58:19', 5),
 (11, 2, 'sistem operasi p7', '', '2025-06-11 03:11:44', '2025-06-11 13:42:11', 4),
 (12, 3, 'Project Admin', 'Review data user dan task', '2025-06-11 10:00:00', '2025-06-11 10:00:00', 7),
 (13, 3, 'Meeting Tim', 'Diskusi fitur baru', '2025-06-11 10:10:00', '2025-06-11 10:10:00', 7),

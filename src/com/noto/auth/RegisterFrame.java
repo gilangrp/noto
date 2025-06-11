@@ -41,7 +41,7 @@ public class RegisterFrame extends JFrame {
         applyGlobalStyles();
         
         // Set up the frame
-        setTitle("Register - ToDoList App");
+        setTitle("Register - Noto App");
         setSize(450, 550); // Adjusted size
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null); // Center on screen
