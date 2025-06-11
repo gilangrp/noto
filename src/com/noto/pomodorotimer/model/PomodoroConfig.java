@@ -6,9 +6,7 @@ package com.noto.pomodorotimer.model;
 public class PomodoroConfig {
     // Default values (in seconds)
     private int focusDuration = 25 * 60;
-    private int shortBreakDuration = 5 * 60;
-    private int longBreakDuration = 15 * 60;
-    private int cyclesBeforeLongBreak = 4;
+    private int totalCycles = 4;
 
     public int getFocusDuration() {
         return focusDuration;
@@ -18,36 +16,18 @@ public class PomodoroConfig {
         this.focusDuration = focusDuration;
     }
 
-    public int getShortBreakDuration() {
-        return shortBreakDuration;
+    public int getTotalCycles() {
+        return totalCycles;
     }
 
-    public void setShortBreakDuration(int shortBreakDuration) {
-        this.shortBreakDuration = shortBreakDuration;
-    }
-
-    public int getLongBreakDuration() {
-        return longBreakDuration;
-    }
-
-    public void setLongBreakDuration(int longBreakDuration) {
-        this.longBreakDuration = longBreakDuration;
-    }
-
-    public int getCyclesBeforeLongBreak() {
-        return cyclesBeforeLongBreak;
-    }
-
-    public void setCyclesBeforeLongBreak(int cyclesBeforeLongBreak) {
-        this.cyclesBeforeLongBreak = cyclesBeforeLongBreak;
+    public void setTotalCycles(int totalCycles) {
+        this.totalCycles = totalCycles;
     }
     
     // Method to set custom configuration
-    public void setCustomConfig(int focusMinutes, int shortBreakMinutes, int longBreakMinutes, int cycles) {
+    public void setCustomConfig(int focusMinutes, int cycles) {
         this.focusDuration = focusMinutes * 60;
-        this.shortBreakDuration = shortBreakMinutes * 60;
-        this.longBreakDuration = longBreakMinutes * 60;
-        this.cyclesBeforeLongBreak = cycles;
+        this.totalCycles = cycles;
     }
     
     // Example preset loading (can be expanded)
@@ -55,27 +35,19 @@ public class PomodoroConfig {
         switch (presetName.toLowerCase()) {
             case "belajar":
                 this.focusDuration = 25 * 60;
-                this.shortBreakDuration = 5 * 60;
-                this.longBreakDuration = 15 * 60;
-                this.cyclesBeforeLongBreak = 4;
+                this.totalCycles = 4;
                 break;
             case "kerja":
                 this.focusDuration = 45 * 60;
-                this.shortBreakDuration = 10 * 60;
-                this.longBreakDuration = 20 * 60;
-                this.cyclesBeforeLongBreak = 3;
+                this.totalCycles = 6;
                 break;
             case "membaca":
                 this.focusDuration = 30 * 60;
-                this.shortBreakDuration = 7 * 60;
-                this.longBreakDuration = 20 * 60;
-                this.cyclesBeforeLongBreak = 4;
+                this.totalCycles = 4;
                 break;
             case "menulis":
                 this.focusDuration = 50 * 60;
-                this.shortBreakDuration = 10 * 60;
-                this.longBreakDuration = 25 * 60;
-                this.cyclesBeforeLongBreak = 3;
+                this.totalCycles = 3;
                 break;
             case "custom":
                 // For custom, don't change values - they should be set via setCustomConfig
@@ -83,9 +55,7 @@ public class PomodoroConfig {
             default:
                 // Default Pomodoro
                 this.focusDuration = 25 * 60;
-                this.shortBreakDuration = 5 * 60;
-                this.longBreakDuration = 15 * 60;
-                this.cyclesBeforeLongBreak = 4;
+                this.totalCycles = 4;
                 break;
         }
     }
