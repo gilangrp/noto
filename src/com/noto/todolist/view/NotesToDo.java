@@ -220,7 +220,12 @@ public class NotesToDo extends JFrame {
     private void handleSaveNote() {
         if (currentNoteTitle != null) {
             saveCurrentNoteDataToMap(currentNoteTitle); // Update local map from UI
-            saveToDatabase(currentNoteTitle); // Save this specific note to DB
+            boolean success = saveToDatabase(currentNoteTitle); // Save this specific note to DB and return status
+            if (success) {
+                JOptionPane.showMessageDialog(this, "Note saved successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "Failed to save note.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
         } else {
             JOptionPane.showMessageDialog(this, "No note selected to save.", "Info", JOptionPane.INFORMATION_MESSAGE);
         }
@@ -230,7 +235,7 @@ public class NotesToDo extends JFrame {
         String selected = noteList.getSelectedValue();
         if (selected != null) {
             int confirm = JOptionPane.showConfirmDialog(this, 
-                "Are you sure you want to delete the note \'" + selected + "\' and its checklist items?", 
+                "Are you sure you want to delete the note '" + selected + "' and its checklist items?", 
                 "Confirm Deletion", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
                 boolean deleted = deleteNoteFromDatabase(selected);
@@ -247,8 +252,9 @@ public class NotesToDo extends JFrame {
                         todoPanel.revalidate();
                         todoPanel.repaint();
                     }
+                    JOptionPane.showMessageDialog(this, "Note deleted successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
                 } else {
-                     JOptionPane.showMessageDialog(this, "Failed to delete note from database.", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Failed to delete note from database.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         } else {
@@ -461,21 +467,20 @@ public class NotesToDo extends JFrame {
     }
 
     // Saves a specific note (identified by title) and its todos to the database
-    private void saveToDatabase(String title) {
+    private boolean saveToDatabase(String title) {
         if (title == null || !notesMap.containsKey(title)) {
              System.err.println("Attempted to save null or non-existent note title: " + title);
-             return;
+             return false;
         }
         NoteData dataToSave = notesMap.get(title);
         DatabaseManager dbManager = DatabaseManager.getInstance();
         boolean success = dbManager.saveNoteAndTodos(userId, title, dataToSave);
         if (success) {
             System.out.println("Note '" + title + "' saved successfully to database.");
-            // Optionally show a status message to the user
-            // JOptionPane.showMessageDialog(this, "Note saved.", "Success", JOptionPane.INFORMATION_MESSAGE);
         } else {
-            JOptionPane.showMessageDialog(this, "Failed to save note '" + title + "' to database.", "Error", JOptionPane.ERROR_MESSAGE);
+            System.err.println("Failed to save note '" + title + "' to database.");
         }
+        return success;
     }
 
     // Delete note from database
