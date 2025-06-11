@@ -58,7 +58,7 @@ Aplikasi ini merupakan implementasi antarmuka Login dan Register menggunakan Jav
 
 1. Buka NetBeans IDE
 2. Pilih menu **File > Open Project**
-3. Arahkan ke folder **LoginRegisterApp** yang telah diekstrak
+3. Arahkan ke folder **NotoApp** yang telah diekstrak
 4. Klik tombol **Open Project**
 5. NetBeans akan secara otomatis mendeteksi struktur proyek
 
@@ -66,7 +66,7 @@ Aplikasi ini merupakan implementasi antarmuka Login dan Register menggunakan Jav
 
 1. Pastikan **MySQL** sudah berjalan dan database sudah dibuat sesuai kebutuhan aplikasi
 2. Konfigurasikan koneksi MySQL di file aplikasi (pastikan username, password, dan nama database benar)
-3. Setelah proyek terbuka di NetBeans, klik kanan pada proyek **LoginRegisterApp** di panel Projects
+3. Setelah proyek terbuka di NetBeans, klik kanan pada proyek **NotoApp** di panel Projects
 4. Pilih **Run** atau tekan tombol F6
 5. Aplikasi akan dikompilasi dan dijalankan secara otomatis
 
