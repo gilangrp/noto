@@ -31,6 +31,8 @@ public class HomeFrame extends JFrame {
     private JPanel statsPanel;
     private JPanel notificationPanel;
     private JPanel navigationPanel;
+    private JPanel centerContentPanel; // Make this a field for swapping
+    private JPanel dashboardPanel; // New: holds statsPanel and notificationPanel
     // UI Components to update
     private JTextArea statsArea;
     private JTextArea notificationArea;
@@ -69,16 +71,18 @@ public class HomeFrame extends JFrame {
         mainPanel.add(headerPanel, BorderLayout.NORTH);
 
         // Create center content panel (Stats & Notifications)
-        JPanel centerContentPanel = new JPanel(new GridLayout(1, 2, 10, 10)); // Side-by-side layout
+        centerContentPanel = new JPanel(new CardLayout());
         centerContentPanel.setOpaque(false);
+        mainPanel.add(centerContentPanel, BorderLayout.CENTER);
 
+        // Dashboard panel (stats + notifications)
+        dashboardPanel = new JPanel(new GridLayout(1, 2, 10, 10));
+        dashboardPanel.setOpaque(false);
         statsPanel = createStatsPanel();
         notificationPanel = createNotificationPanel();
-
-        centerContentPanel.add(statsPanel);
-        centerContentPanel.add(notificationPanel);
-
-        mainPanel.add(centerContentPanel, BorderLayout.CENTER);
+        dashboardPanel.add(statsPanel);
+        dashboardPanel.add(notificationPanel);
+        centerContentPanel.add(dashboardPanel, "dashboard");
 
         // Create bottom navigation panel
         navigationPanel = createNavigationPanel();
@@ -190,18 +194,8 @@ public class HomeFrame extends JFrame {
     private JPanel createNavigationPanel() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         panel.setOpaque(false);
-
-        // JButton notesButton = createStyledButton("Notes & ToDo", BUTTON_NOTES_COLOR);
         JButton pomodoroButton = createStyledButton("Pomodoro Timer", BUTTON_POMODORO_COLOR);
-        CategoryButton categoryButton = new CategoryButton(userId);
-
-        // notesButton.addActionListener(e -> {
-        //     SwingUtilities.invokeLater(() -> {
-        //         NotesToDo notesFrame = new NotesToDo(userId);
-        //         notesFrame.setVisible(true);
-        //     });
-        // });
-
+        CategoryButton categoryButton = new CategoryButton(userId, () -> showCategoryPage());
         pomodoroButton.addActionListener(e -> {
             SwingUtilities.invokeLater(() -> {
                 PomodoroConfig config = new PomodoroConfig();
@@ -211,8 +205,6 @@ public class HomeFrame extends JFrame {
                 pomodoroFrame.setVisible(true);
             });
         });
-
-        // panel.add(notesButton);
         panel.add(categoryButton);
         panel.add(pomodoroButton);
         return panel;
@@ -268,5 +260,19 @@ public class HomeFrame extends JFrame {
                 notificationArea.setText(String.join("\n", notifications));
             }
         });
+    }
+
+    // Show CategoryPage in centerContentPanel
+    private void showCategoryPage() {
+        CategoryPage categoryPage = new CategoryPage(userId, this::showDashboard);
+        centerContentPanel.add(categoryPage, "category");
+        CardLayout cl = (CardLayout) centerContentPanel.getLayout();
+        cl.show(centerContentPanel, "category");
+    }
+
+    // Show dashboard (stats + notifications)
+    private void showDashboard() {
+        CardLayout cl = (CardLayout) centerContentPanel.getLayout();
+        cl.show(centerContentPanel, "dashboard");
     }
 }

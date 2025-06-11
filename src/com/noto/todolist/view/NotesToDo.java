@@ -119,13 +119,13 @@ public class NotesToDo extends JFrame {
         JButton addToDoBtn = createStyledButton("Add Checklist Item", buttonTodoColor);
         JButton saveBtn = createStyledButton("Save Note", buttonSaveColor);
         JButton deleteNoteBtn = createStyledButton("Delete Note", Color.PINK);
-        JButton viewCategoriesBtn = createStyledButton("Categories", new Color(230, 230, 250)); // Light lavender
+        // JButton viewCategoriesBtn = createStyledButton("Categories", new Color(230, 230, 250)); // Light lavender
         
         topButtonPanel.add(addNoteBtn);
         topButtonPanel.add(addToDoBtn);
         topButtonPanel.add(saveBtn);
         topButtonPanel.add(deleteNoteBtn);
-        topButtonPanel.add(viewCategoriesBtn);
+        // topButtonPanel.add(viewCategoriesBtn);
         topPanel.add(topButtonPanel, BorderLayout.NORTH);
         
         // Category Panel
@@ -148,7 +148,7 @@ public class NotesToDo extends JFrame {
         addToDoBtn.addActionListener(e -> handleAddChecklistItem());
         saveBtn.addActionListener(e -> handleSaveNote());
         deleteNoteBtn.addActionListener(e -> handleDeleteNote());
-        viewCategoriesBtn.addActionListener(e -> handleViewCategories());
+        // viewCategoriesBtn.addActionListener(e -> handleViewCategories());
         noteList.addListSelectionListener(e -> handleNoteSelection(e));
 
         // Load categories
@@ -256,28 +256,28 @@ public class NotesToDo extends JFrame {
         }
     }
     
-    private void handleViewCategories() {
-        // Open the category page
-        CategoryPage categoryPage = new CategoryPage(userId);
-        categoryPage.setVisible(true);
+    // private void handleViewCategories() {
+    //     // Open the category page
+    //     CategoryPage categoryPage = new CategoryPage(userId);
+    //     categoryPage.setVisible(true);
         
-        // Add window listener to refresh notes when CategoryPage is closed
-        categoryPage.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosed(WindowEvent e) {
-                // Reload categories and notes
-                loadCategories();
-                loadFromDatabase();
+    //     // Add window listener to refresh notes when CategoryPage is closed
+    //     categoryPage.addWindowListener(new WindowAdapter() {
+    //         @Override
+    //         public void windowClosed(WindowEvent e) {
+    //             // Reload categories and notes
+    //             loadCategories();
+    //             loadFromDatabase();
                 
-                // Reselect current note if it still exists
-                if (currentNoteTitle != null && noteListModel.contains(currentNoteTitle)) {
-                    noteList.setSelectedValue(currentNoteTitle, true);
-                } else if (noteListModel.size() > 0) {
-                    noteList.setSelectedIndex(0);
-                }
-            }
-        });
-    }
+    //             // Reselect current note if it still exists
+    //             if (currentNoteTitle != null && noteListModel.contains(currentNoteTitle)) {
+    //                 noteList.setSelectedValue(currentNoteTitle, true);
+    //             } else if (noteListModel.size() > 0) {
+    //                 noteList.setSelectedIndex(0);
+    //             }
+    //         }
+    //     });
+    // }
 
     private void handleNoteSelection(javax.swing.event.ListSelectionEvent e) {
         if (!e.getValueIsAdjusting()) {
