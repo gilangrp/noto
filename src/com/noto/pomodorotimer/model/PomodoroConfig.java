@@ -59,6 +59,18 @@ public class PomodoroConfig {
                 this.longBreakDuration = 20 * 60;
                 this.cyclesBeforeLongBreak = 3;
                 break;
+            case "membaca":
+                this.focusDuration = 30 * 60;
+                this.shortBreakDuration = 10 * 60;
+                this.longBreakDuration = 20 * 60;
+                this.cyclesBeforeLongBreak = 3;
+                break:
+            case "menulis":
+                this.focusDuration = 20 * 60;
+                this.shortBreakDuration = 5 * 60;
+                this.longBreakDuration = 15 * 60;
+                this.cyclesBeforeLongBreak = 4;
+                break;
             // Add more presets as needed
             default:
                 // Default Pomodoro
