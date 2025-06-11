@@ -272,6 +272,7 @@ public class HomeFrame extends JFrame {
 
     // Show dashboard (stats + notifications)
     private void showDashboard() {
+        loadDashboardData(); // Reload statistics setiap kali kembali dari CategoryPage
         CardLayout cl = (CardLayout) centerContentPanel.getLayout();
         cl.show(centerContentPanel, "dashboard");
     }
