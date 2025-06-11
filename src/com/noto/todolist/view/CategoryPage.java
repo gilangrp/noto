@@ -24,17 +24,22 @@ public class CategoryPage extends JPanel {
     private Map<String, Color> categoryColors = new HashMap<>();
     private Map<String, Integer> categoryIds = new HashMap<>();
     private DatabaseManager dbManager;
+    private boolean isAdmin;
 
     public CategoryPage(int userId, Runnable onBack) {
         this.userId = userId;
         this.dbManager = DatabaseManager.getInstance();
         this.onBack = onBack;
+        // Cek status admin
+        this.isAdmin = dbManager.isUserAdmin(userId);
         setLayout(new BorderLayout());
         setPreferredSize(new Dimension(900, 600));
         // Set up UI components
         setupUI();
         // Load categories
         loadCategories();
+        // Contoh: log status admin
+        System.out.println("User is admin: " + isAdmin);
     }
 
     private void setupUI() {
@@ -325,10 +330,14 @@ public class CategoryPage extends JPanel {
         // Clear notes list
         notesListModel.clear();
 
-        // Load notes based on category
+        // Load notes berdasarkan admin atau bukan
         Map<String, NoteData> notes;
         if (categoryName.equals("All Notes")) {
-            notes = dbManager.loadNotes(userId);
+            if (isAdmin) {
+                notes = dbManager.loadNotesWithAdmin(userId);
+            } else {
+                notes = dbManager.loadNotes(userId);
+            }
         } else {
             notes = dbManager.loadNotesByCategory(userId, categoryName);
         }

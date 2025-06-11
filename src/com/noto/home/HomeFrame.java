@@ -239,15 +239,22 @@ public class HomeFrame extends JFrame {
     // Method to load data for stats and notifications using DatabaseManager API
     private void loadDashboardData() {
         DatabaseManager dbManager = DatabaseManager.getInstance();
+        boolean isAdmin = dbManager.isUserAdmin(userId);
 
-        // Get task counts
-        Map<String, Integer> counts = dbManager.getTaskCounts(userId);
+        Map<String, Integer> counts;
+        List<String> notifications;
+        if (isAdmin) {
+            // Admin: statistik dan notifikasi semua user
+            counts = dbManager.getTaskCounts(0); // statistik semua user
+            notifications = dbManager.getPendingTaskNotifications(0, 5); // notifikasi semua user
+        } else {
+            // User biasa: hanya task milik sendiri
+            counts = dbManager.getTaskCounts(userId);
+            notifications = dbManager.getPendingTaskNotifications(userId, 5);
+        }
         int totalTasks = counts.getOrDefault("total", 0);
         int completedTasks = counts.getOrDefault("completed", 0);
         int pendingTasks = counts.getOrDefault("pending", 0);
-
-        // Get pending task notifications (limit to 5 for display)
-        List<String> notifications = dbManager.getPendingTaskNotifications(userId, 5);
 
         // Update UI on the Event Dispatch Thread
         SwingUtilities.invokeLater(() -> {

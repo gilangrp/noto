@@ -19,7 +19,7 @@ public class DatabaseManager {
     // --- MySQL Configuration ---
     private static final String DB_HOST = "localhost";
     private static final String DB_PORT = "3306";
-    private static final String DB_NAME = "todolist_db";
+    private static final String DB_NAME = "todolist_db_test_admin";
     private static final String DB_USER = "root"; // Default MySQL username for testing
     private static final String DB_PASSWORD = ""; // Empty password for testing
     private static final String DB_URL = "jdbc:mysql://" + DB_HOST + ":" + DB_PORT + "/" + DB_NAME + "?user=" + DB_USER
@@ -782,21 +782,19 @@ public class DatabaseManager {
         counts.put("completed", 0);
         counts.put("pending", 0);
 
-        // Karena tidak ada user_id di note_todos, saya asumsikan user_id bisa di-join
-        // lewat notes table
-        // atau note_id yang terkait ke user.
-        // Kalau kamu memang punya table `notes` yang punya `user_id`, kita bisa JOIN.
-
-        String countSql = "SELECT " +
-                "    COUNT(*) AS total, " +
-                "    SUM(CASE WHEN completed = 1 THEN 1 ELSE 0 END) AS completed, " +
-                "    SUM(CASE WHEN completed = 0 THEN 1 ELSE 0 END) AS pending " +
-                "FROM note_todos nt " +
-                "JOIN notes n ON nt.note_id = n.note_id " + // asumsi notes punya user_id
-                "WHERE n.user_id = ?";
+        String countSql;
+        if (userId == 0) {
+            // Admin: hitung semua task
+            countSql = "SELECT COUNT(*) AS total, SUM(CASE WHEN completed = 1 THEN 1 ELSE 0 END) AS completed, SUM(CASE WHEN completed = 0 THEN 1 ELSE 0 END) AS pending FROM note_todos nt JOIN notes n ON nt.note_id = n.note_id";
+        } else {
+            // User biasa: hanya task milik sendiri
+            countSql = "SELECT COUNT(*) AS total, SUM(CASE WHEN completed = 1 THEN 1 ELSE 0 END) AS completed, SUM(CASE WHEN completed = 0 THEN 1 ELSE 0 END) AS pending FROM note_todos nt JOIN notes n ON nt.note_id = n.note_id WHERE n.user_id = ?";
+        }
 
         try (PreparedStatement psCount = connection.prepareStatement(countSql)) {
-            psCount.setInt(1, userId);
+            if (userId != 0) {
+                psCount.setInt(1, userId);
+            }
             ResultSet rsCount = psCount.executeQuery();
             if (rsCount.next()) {
                 int total = rsCount.getInt("total");
@@ -821,26 +819,30 @@ public class DatabaseManager {
     public List<String> getPendingTaskNotifications(int userId, int limit) {
         List<String> notifications = new ArrayList<>();
 
-        String pendingSql = "SELECT nt.description " +
-                "FROM note_todos nt " +
-                "JOIN notes n ON nt.note_id = n.note_id " + // asumsi notes punya user_id
-                "WHERE n.user_id = ? AND nt.completed = 0 " +
-                "ORDER BY nt.todo_id ASC " +
-                "LIMIT ?";
+        String pendingSql;
+        if (userId == 0) {
+            // Admin: semua pending task
+            pendingSql = "SELECT nt.description FROM note_todos nt JOIN notes n ON nt.note_id = n.note_id WHERE nt.completed = 0 ORDER BY nt.todo_id ASC LIMIT ?";
+        } else {
+            // User biasa: hanya pending task milik sendiri
+            pendingSql = "SELECT nt.description FROM note_todos nt JOIN notes n ON nt.note_id = n.note_id WHERE n.user_id = ? AND nt.completed = 0 ORDER BY nt.todo_id ASC LIMIT ?";
+        }
 
         try (PreparedStatement psPending = connection.prepareStatement(pendingSql)) {
-            psPending.setInt(1, userId);
-            psPending.setInt(2, limit);
+            if (userId == 0) {
+                psPending.setInt(1, limit);
+            } else {
+                psPending.setInt(1, userId);
+                psPending.setInt(2, limit);
+            }
 
             ResultSet rsPending = psPending.executeQuery();
             while (rsPending.next()) {
                 String description = rsPending.getString("description");
-                // Tidak pakai priority, cukup tampilkan description
                 notifications.add("- " + description);
             }
         } catch (SQLException e) {
             System.err.println("Error getting pending task notifications: " + e.getMessage());
-            // Return empty list on error
         }
         return notifications;
     }
@@ -873,4 +875,67 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Get is_admin status for a user
+     */
+    public boolean isUserAdmin(int userId) {
+        String sql = "SELECT is_admin FROM users WHERE user_id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("is_admin") == 1;
+            }
+        } catch (SQLException e) {
+            System.err.println("Error checking is_admin: " + e.getMessage());
+        }
+        return false;
+    }
+
+    /**
+     * Contoh: Load all notes, jika admin load semua user, jika bukan admin hanya user sendiri
+     */
+    public Map<String, NoteData> loadNotesWithAdmin(int userId) {
+        boolean admin = isUserAdmin(userId);
+        Map<String, NoteData> notesMap = new HashMap<>();
+        String selectNotesSQL;
+        if (admin) {
+        System.out.println("this User is adminssss: " );
+
+            selectNotesSQL = "SELECT n.note_id, n.title, n.content, c.name as category_name FROM notes n LEFT JOIN note_categories c ON n.category_id = c.category_id ORDER BY n.title ASC";
+        } else {
+            selectNotesSQL = "SELECT n.note_id, n.title, n.content, c.name as category_name FROM notes n LEFT JOIN note_categories c ON n.category_id = c.category_id WHERE n.user_id = ? ORDER BY n.title ASC";
+        }
+        String selectTodosSQL = "SELECT description, completed FROM note_todos WHERE note_id = ?";
+        try (PreparedStatement psNotes = connection.prepareStatement(selectNotesSQL)) {
+            if (!admin) {
+                psNotes.setInt(1, userId);
+            }
+            ResultSet rsNotes = psNotes.executeQuery();
+            while (rsNotes.next()) {
+                int noteId = rsNotes.getInt("note_id");
+                String title = rsNotes.getString("title");
+                String content = rsNotes.getString("content");
+                String category = rsNotes.getString("category_name");
+                if (category == null) category = "Uncategorized";
+                NoteData data = new NoteData();
+                data.content = content;
+                data.category = category;
+                data.todos = new ArrayList<>();
+                try (PreparedStatement psTodos = connection.prepareStatement(selectTodosSQL)) {
+                    psTodos.setInt(1, noteId);
+                    ResultSet rsTodos = psTodos.executeQuery();
+                    while (rsTodos.next()) {
+                        String text = rsTodos.getString("description");
+                        boolean completed = rsTodos.getInt("completed") == 1;
+                        data.todos.add(new TodoItem(text, completed));
+                    }
+                }
+                notesMap.put(title, data);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error loading notes (admin-aware): " + e.getMessage());
+        }
+        return notesMap;
+    }
 }
