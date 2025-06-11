@@ -16,7 +16,7 @@ public class CategoryButton extends JButton {
     private static final Font BOLD_FONT = new Font("SansSerif", Font.BOLD, 16);
     
     public CategoryButton(int userId) {
-        setText("Categories");
+        setText("Write Notes");
         setBackground(BUTTON_CATEGORY_COLOR);
         setForeground(Color.BLACK);
         setFocusPainted(false);

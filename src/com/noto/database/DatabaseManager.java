@@ -915,4 +915,32 @@ public class DatabaseManager {
         return notifications;
     }
 
+    /**
+     * Creates a new note for a user in a specific category. Only title is required, content and todos can be empty.
+     * Returns true if note created successfully, false otherwise.
+     */
+    public boolean createNote(int userId, String noteTitle, int categoryId) {
+        if (noteTitle == null || noteTitle.trim().isEmpty()) {
+            System.err.println("Cannot create note with empty title");
+            return false;
+        }
+        String sql = "INSERT INTO notes (user_id, category_id, title, content) VALUES (?, ?, ?, '')";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, userId);
+            pstmt.setInt(2, categoryId);
+            pstmt.setString(3, noteTitle.trim());
+            int affectedRows = pstmt.executeUpdate();
+            if (affectedRows > 0) {
+                System.out.println("Note '" + noteTitle + "' created for user " + userId + " in category " + categoryId);
+                return true;
+            } else {
+                System.err.println("Failed to insert note: " + noteTitle);
+                return false;
+            }
+        } catch (SQLException e) {
+            System.err.println("Error creating note: " + e.getMessage());
+            return false;
+        }
+    }
+
 }

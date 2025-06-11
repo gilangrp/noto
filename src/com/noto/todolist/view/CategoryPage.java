@@ -120,6 +120,15 @@ public class CategoryPage extends JFrame {
         notesLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
         notesHeaderPanel.add(notesLabel, BorderLayout.WEST);
         
+        // Add Note button
+        JButton addNoteBtn = new JButton("+");
+        addNoteBtn.setFont(new Font("SansSerif", Font.BOLD, 12));
+        addNoteBtn.setPreferredSize(new Dimension(25, 25));
+        addNoteBtn.setFocusPainted(false);
+        addNoteBtn.setMargin(new Insets(2, 2, 2, 2));
+        addNoteBtn.addActionListener(e -> handleAddNotePopup());
+        notesHeaderPanel.add(addNoteBtn, BorderLayout.EAST);
+        
         notesPanel.add(notesHeaderPanel, BorderLayout.NORTH);
         notesPanel.add(notesScrollPane, BorderLayout.CENTER);
         
@@ -479,6 +488,33 @@ public class CategoryPage extends JFrame {
                     loadNotesByCategory(currentCategory);
                 }
             });
+        }
+    }
+    
+    // Tambahkan method baru untuk handle add note popup
+    private void handleAddNotePopup() {
+        if (currentCategory == null || currentCategory.equals("All Notes")) {
+            JOptionPane.showMessageDialog(this, "Pilih kategori terlebih dahulu.", "Info", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        String noteTitle = JOptionPane.showInputDialog(this, "Masukkan nama note:");
+        if (noteTitle != null && !noteTitle.trim().isEmpty()) {
+            int confirm = JOptionPane.showConfirmDialog(this, "Buat note dengan nama: '" + noteTitle + "'?", "Konfirmasi", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                // Simpan ke DB
+                Integer categoryId = categoryIds.get(currentCategory);
+                if (categoryId == null) {
+                    JOptionPane.showMessageDialog(this, "Kategori tidak ditemukan.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                boolean success = dbManager.createNote(userId, noteTitle, categoryId);
+                if (success) {
+                    loadCategories();
+                    loadNotesByCategory(currentCategory);
+                } else {
+                    JOptionPane.showMessageDialog(this, "Gagal membuat note.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
         }
     }
 }
