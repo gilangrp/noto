@@ -20,8 +20,6 @@ public class PomodoroView extends JFrame {
     
     // Custom duration input fields
     private JSpinner focusSpinner;
-    private JSpinner shortBreakSpinner;
-    private JSpinner longBreakSpinner;
     private JSpinner cyclesSpinner;
     private JPanel customPanel;
     private JButton applyButton;
@@ -33,7 +31,7 @@ public class PomodoroView extends JFrame {
     private void initComponents() {
         setTitle("Pomodoro Timer");
         // setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(400, 450);
+        setSize(400, 350);
         setLocationRelativeTo(null); // Center the window
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -69,7 +67,7 @@ public class PomodoroView extends JFrame {
         gbc.gridy = 3;
         gbc.gridwidth = 4;
         gbc.ipady = 0; // Reset padding
-        statusLabel = new JLabel("Status: Siap (Fokus 1 dari 4)", SwingConstants.CENTER);
+        statusLabel = new JLabel("Status: Siap (Sesi 1 dari 4)", SwingConstants.CENTER);
         statusLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
         add(statusLabel, gbc);
 
@@ -120,38 +118,22 @@ public class PomodoroView extends JFrame {
 
         // Focus duration
         gbc.gridx = 0; gbc.gridy = 0;
-        panel.add(new JLabel("Fokus (menit):"), gbc);
+        panel.add(new JLabel("Durasi Fokus (menit):"), gbc);
         gbc.gridx = 1;
         focusSpinner = new JSpinner(new SpinnerNumberModel(25, 1, 120, 1));
         focusSpinner.setPreferredSize(new Dimension(80, 25));
         panel.add(focusSpinner, gbc);
 
-        // Short break duration
+        // Total cycles
         gbc.gridx = 0; gbc.gridy = 1;
-        panel.add(new JLabel("Istirahat Singkat (menit):"), gbc);
+        panel.add(new JLabel("Jumlah Sesi:"), gbc);
         gbc.gridx = 1;
-        shortBreakSpinner = new JSpinner(new SpinnerNumberModel(5, 1, 60, 1));
-        shortBreakSpinner.setPreferredSize(new Dimension(80, 25));
-        panel.add(shortBreakSpinner, gbc);
-
-        // Long break duration
-        gbc.gridx = 0; gbc.gridy = 2;
-        panel.add(new JLabel("Istirahat Panjang (menit):"), gbc);
-        gbc.gridx = 1;
-        longBreakSpinner = new JSpinner(new SpinnerNumberModel(15, 1, 120, 1));
-        longBreakSpinner.setPreferredSize(new Dimension(80, 25));
-        panel.add(longBreakSpinner, gbc);
-
-        // Cycles before long break
-        gbc.gridx = 0; gbc.gridy = 3;
-        panel.add(new JLabel("Siklus sebelum istirahat panjang:"), gbc);
-        gbc.gridx = 1;
-        cyclesSpinner = new JSpinner(new SpinnerNumberModel(4, 1, 10, 1));
+        cyclesSpinner = new JSpinner(new SpinnerNumberModel(4, 1, 20, 1));
         cyclesSpinner.setPreferredSize(new Dimension(80, 25));
         panel.add(cyclesSpinner, gbc);
 
         // Apply button
-        gbc.gridx = 0; gbc.gridy = 4;
+        gbc.gridx = 0; gbc.gridy = 2;
         gbc.gridwidth = 2;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         applyButton = new JButton("Terapkan Pengaturan");
@@ -229,22 +211,12 @@ public class PomodoroView extends JFrame {
         return (Integer) focusSpinner.getValue();
     }
 
-    public int getCustomShortBreakDuration() {
-        return (Integer) shortBreakSpinner.getValue();
-    }
-
-    public int getCustomLongBreakDuration() {
-        return (Integer) longBreakSpinner.getValue();
-    }
-
     public int getCustomCycles() {
         return (Integer) cyclesSpinner.getValue();
     }
 
-    public void setCustomValues(int focus, int shortBreak, int longBreak, int cycles) {
+    public void setCustomValues(int focus, int cycles) {
         focusSpinner.setValue(focus);
-        shortBreakSpinner.setValue(shortBreak);
-        longBreakSpinner.setValue(longBreak);
         cyclesSpinner.setValue(cycles);
     }
 

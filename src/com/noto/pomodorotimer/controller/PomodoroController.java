@@ -54,13 +54,12 @@ public class PomodoroController {
         int seconds = totalSeconds % 60;
         view.updateTime(String.format("%02d:%02d", minutes, seconds));
 
-        String statusText = String.format("Status: %s (%d dari %d)",
-                                        getSessionName(state.getCurrentSessionType()),
+        String statusText = String.format("Status: Sesi %d dari %d",
                                         state.getCurrentCycle(),
-                                        config.getCyclesBeforeLongBreak());
+                                        config.getTotalCycles());
         view.updateStatus(statusText);
 
-        int maxDuration = getMaxDurationForCurrentSession();
+        int maxDuration = config.getFocusDuration();
         view.updateProgress(maxDuration, state.getSecondsRemaining());
 
         // Update button states
@@ -84,8 +83,8 @@ public class PomodoroController {
     private String getSessionName(TimerState.SessionType type) {
         switch (type) {
             case FOCUS: return "Fokus";
-            case SHORT_BREAK: return "Istirahat Singkat";
-            case LONG_BREAK: return "Istirahat Panjang";
+            case SHORT_BREAK: return "Jeda Singkat";
+            case LONG_BREAK: return "Jeda Panjang";
             default: return "Unknown";
         }
     }
@@ -135,13 +134,23 @@ public class PomodoroController {
                     swingTimer.stop();
                     state.setRunning(false);
                     playSound(); // Play the custom sound instead of beep
-                    String message = getSessionName(state.getCurrentSessionType()) + " selesai!";
-                    state.nextSession(config); // Transition to the next session state
-                    message += "\nMulai " + getSessionName(state.getCurrentSessionType()) + "?";
-                    // Update view immediately to show next session info before dialog
+                    
+                    String message;
+                    if (state.getCurrentCycle() >= config.getTotalCycles()) {
+                        message = "Semua sesi selesai!\nAnda telah menyelesaikan " + config.getTotalCycles() + " sesi fokus.";
+                        JOptionPane.showMessageDialog(view, message, "Selamat!", JOptionPane.INFORMATION_MESSAGE);
+                        // Reset to first cycle
+                        state.resetToStart(config);
+                    } else {
+                        message = "Sesi " + state.getCurrentCycle() + " selesai!\nLanjut ke sesi berikutnya?";
+                        int option = JOptionPane.showConfirmDialog(view, message, "Sesi Selesai", 
+                                                                 JOptionPane.YES_NO_OPTION, 
+                                                                 JOptionPane.INFORMATION_MESSAGE);
+                        if (option == JOptionPane.YES_OPTION) {
+                            state.nextSession(config);
+                        }
+                    }
                     updateView();
-                    JOptionPane.showMessageDialog(view, message, "Waktu Habis", JOptionPane.INFORMATION_MESSAGE);
-                    // View is already updated, user needs to press Start again
                 }
             }
         }
@@ -188,16 +197,14 @@ public class PomodoroController {
                 // Show custom panel and set current values
                 view.setCustomValues(
                     config.getFocusDuration() / 60,
-                    config.getShortBreakDuration() / 60,
-                    config.getLongBreakDuration() / 60,
-                    config.getCyclesBeforeLongBreak()
+                    config.getTotalCycles()
                 );
                 view.showCustomPanel(true);
             } else {
                 // Hide custom panel and load preset
                 view.showCustomPanel(false);
                 config.loadPreset(selectedPreset);
-                state.resetToFocus(config); // Reset state completely based on new config
+                state.resetToStart(config); // Reset state completely based on new config
                 updateView();
             }
         }
@@ -209,12 +216,10 @@ public class PomodoroController {
             try {
                 // Get custom values from view
                 int focusMinutes = view.getCustomFocusDuration();
-                int shortBreakMinutes = view.getCustomShortBreakDuration();
-                int longBreakMinutes = view.getCustomLongBreakDuration();
                 int cycles = view.getCustomCycles();
 
                 // Validate input
-                if (focusMinutes < 1 || shortBreakMinutes < 1 || longBreakMinutes < 1 || cycles < 1) {
+                if (focusMinutes < 1 || cycles < 1) {
                     JOptionPane.showMessageDialog(view, 
                         "Semua nilai harus lebih besar dari 0!", 
                         "Input Tidak Valid", 
@@ -226,10 +231,10 @@ public class PomodoroController {
                 swingTimer.stop();
                 
                 // Apply custom configuration
-                config.setCustomConfig(focusMinutes, shortBreakMinutes, longBreakMinutes, cycles);
+                config.setCustomConfig(focusMinutes, cycles);
                 
-                // Reset state to focus with new configuration
-                state.resetToFocus(config);
+                // Reset state to start with new configuration
+                state.resetToStart(config);
                 
                 // Update view
                 updateView();
@@ -237,10 +242,8 @@ public class PomodoroController {
                 // Show confirmation
                 JOptionPane.showMessageDialog(view, 
                     "Pengaturan custom berhasil diterapkan!\n" +
-                    "Fokus: " + focusMinutes + " menit\n" +
-                    "Istirahat Singkat: " + shortBreakMinutes + " menit\n" +
-                    "Istirahat Panjang: " + longBreakMinutes + " menit\n" +
-                    "Siklus: " + cycles, 
+                    "Durasi Fokus: " + focusMinutes + " menit\n" +
+                    "Jumlah Sesi: " + cycles, 
                     "Pengaturan Diterapkan", 
                     JOptionPane.INFORMATION_MESSAGE);
                     
