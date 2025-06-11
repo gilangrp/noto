@@ -103,7 +103,6 @@ public class PomodoroView extends JFrame {
         floatButton.setText(isFloating ? "Float" : "Unfloat");
     }
 
-    // --- Methods to update the view --- 
 
     public void updateTime(String timeString) {
         timeLabel.setText(timeString);

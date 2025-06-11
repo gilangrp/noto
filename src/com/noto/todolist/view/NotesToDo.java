@@ -119,13 +119,12 @@ public class NotesToDo extends JFrame {
         JButton addToDoBtn = createStyledButton("Add Checklist Item", buttonTodoColor);
         JButton saveBtn = createStyledButton("Save Note", buttonSaveColor);
         JButton deleteNoteBtn = createStyledButton("Delete Note", Color.PINK);
-        // JButton viewCategoriesBtn = createStyledButton("Categories", new Color(230, 230, 250)); // Light lavender
+
         
         topButtonPanel.add(addNoteBtn);
         topButtonPanel.add(addToDoBtn);
         topButtonPanel.add(saveBtn);
         topButtonPanel.add(deleteNoteBtn);
-        // topButtonPanel.add(viewCategoriesBtn);
         topPanel.add(topButtonPanel, BorderLayout.NORTH);
         
         // Category Panel
@@ -170,15 +169,11 @@ public class NotesToDo extends JFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                // Consider prompting user if there are unsaved changes
-                // handleSaveNote(); // Optionally save automatically
-            }
         });
         
         setLocationRelativeTo(null); // Center window
     }
     
-    // --- Event Handlers --- 
     private void handleAddNote() {
         String title = JOptionPane.showInputDialog(this, "Enter note title:");
         if (title != null && !title.isBlank()) {
@@ -262,37 +257,10 @@ public class NotesToDo extends JFrame {
         }
     }
     
-    // private void handleViewCategories() {
-    //     // Open the category page
-    //     CategoryPage categoryPage = new CategoryPage(userId);
-    //     categoryPage.setVisible(true);
-        
-    //     // Add window listener to refresh notes when CategoryPage is closed
-    //     categoryPage.addWindowListener(new WindowAdapter() {
-    //         @Override
-    //         public void windowClosed(WindowEvent e) {
-    //             // Reload categories and notes
-    //             loadCategories();
-    //             loadFromDatabase();
-                
-    //             // Reselect current note if it still exists
-    //             if (currentNoteTitle != null && noteListModel.contains(currentNoteTitle)) {
-    //                 noteList.setSelectedValue(currentNoteTitle, true);
-    //             } else if (noteListModel.size() > 0) {
-    //                 noteList.setSelectedIndex(0);
-    //             }
-    //         }
-    //     });
-    // }
 
     private void handleNoteSelection(javax.swing.event.ListSelectionEvent e) {
         if (!e.getValueIsAdjusting()) {
             String selected = noteList.getSelectedValue();
-            // Save previous note before switching (optional, consider prompting)
-            // if (currentNoteTitle != null && !currentNoteTitle.equals(selected)) {
-            //     saveCurrentNoteDataToMap(currentNoteTitle);
-            //     // Maybe prompt to save to DB?
-            // }
             
             // Load selected note
             if (selected != null) {

@@ -495,7 +495,6 @@ public class CategoryPage extends JPanel {
         }
     }
 
-    // Tambahkan method baru untuk handle add note popup
     private void handleAddNotePopup() {
         if (currentCategory == null || currentCategory.equals("All Notes")) {
             JOptionPane.showMessageDialog(this, "Pilih kategori terlebih dahulu.", "Info", JOptionPane.INFORMATION_MESSAGE);
@@ -505,7 +504,6 @@ public class CategoryPage extends JPanel {
         if (noteTitle != null && !noteTitle.trim().isEmpty()) {
             int confirm = JOptionPane.showConfirmDialog(this, "Buat note dengan nama: '" + noteTitle + "'?", "Konfirmasi", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
-                // Simpan ke DB
                 Integer categoryId = categoryIds.get(currentCategory);
                 if (categoryId == null) {
                     JOptionPane.showMessageDialog(this, "Kategori tidak ditemukan.", "Error", JOptionPane.ERROR_MESSAGE);

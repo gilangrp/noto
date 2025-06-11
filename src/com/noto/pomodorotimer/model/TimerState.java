@@ -64,7 +64,7 @@ public class TimerState {
                 currentSessionType = SessionType.SHORT_BREAK;
                 secondsRemaining = config.getShortBreakDuration();
             }
-        } else { // If current session was SHORT_BREAK or LONG_BREAK
+        } else { 
             currentSessionType = SessionType.FOCUS;
             secondsRemaining = config.getFocusDuration();
             if (currentSessionType != SessionType.LONG_BREAK) { // Only increment cycle after short break

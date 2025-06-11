@@ -16,28 +16,24 @@ import com.noto.todolist.view.NotesToDo;
 import javax.swing.event.TableModelEvent;
 import java.awt.*;
 import java.awt.event.*;
-// Removed java.sql.* as direct connection is no longer used here
-import java.util.*;
-import java.util.List; // Explicit import for List
 
-/**
- * Redesigned Home frame displaying statistics, notifications, and navigation.
- */
+import java.util.*;
+import java.util.List;
+
+
 public class HomeFrame extends JFrame {
     private int userId;
     private String fullName;
     private JPanel mainPanel;
-    // Panels for new layout
+
     private JPanel statsPanel;
     private JPanel notificationPanel;
     private JPanel navigationPanel;
-    private JPanel centerContentPanel; // Make this a field for swapping
-    private JPanel dashboardPanel; // New: holds statsPanel and notificationPanel
-    // UI Components to update
+    private JPanel centerContentPanel;
+    private JPanel dashboardPanel; 
     private JTextArea statsArea;
     private JTextArea notificationArea;
 
-    // Style constants from NotesToDo
     private static final Font UI_FONT = new Font("SansSerif", Font.PLAIN, 14);
     private static final Font BOLD_FONT = new Font("SansSerif", Font.BOLD, 16);
     private static final Font HEADER_FONT = new Font("Segoe UI", Font.BOLD, 18);
