@@ -36,7 +36,7 @@ public class DatabaseManager {
             Class.forName("com.mysql.cj.jdbc.Driver");
             System.out.println("Connecting to database: " + DB_URL.replace(DB_PASSWORD, "********"));
             connection = DriverManager.getConnection(DB_URL);
-            initializeDatabase(); // Initialize core tables (users, todo_items, etc.)
+            initializeDatabase(); // Initialize core tables (users, etc.)
             System.out.println("MySQL Database connection established successfully.");
         } catch (ClassNotFoundException e) {
             System.err.println("MySQL JDBC driver not found: " + e.getMessage());
@@ -226,45 +226,6 @@ public class DatabaseManager {
         return -1;
     }
 
-    // --- Todo Item Management (Existing Methods) ---
-    public ResultSet getUserTodoItems(int userId) {
-        String sql = "SELECT * FROM todo_items WHERE user_id = ? ORDER BY priority DESC, created_at DESC";
-        try {
-            PreparedStatement pstmt = connection.prepareStatement(sql);
-            pstmt.setInt(1, userId);
-            return pstmt.executeQuery();
-        } catch (SQLException e) {
-            System.err.println("Error getting user todo items: " + e.getMessage());
-            return null;
-        }
-    }
-
-    public boolean addTodoItem(int userId, String title, String description, int priority) {
-        String sql = "INSERT INTO todo_items (user_id, title, description, priority) VALUES (?, ?, ?, ?)";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, userId);
-            pstmt.setString(2, title);
-            pstmt.setString(3, description);
-            pstmt.setInt(4, priority);
-            return pstmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.err.println("Error adding todo item: " + e.getMessage());
-            return false;
-        }
-    }
-
-    public boolean updateTodoStatus(int todoId, String status) {
-        String sql = "UPDATE todo_items SET status = ? WHERE todo_id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, status);
-            pstmt.setInt(2, todoId);
-            return pstmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.err.println("Error updating todo status: " + e.getMessage());
-            return false;
-        }
-    }
-
     // --- Settings Management (Existing Methods) ---
     public ResultSet getUserSettings(int userId) {
         String sql = "SELECT * FROM user_settings WHERE user_id = ?";
@@ -292,38 +253,7 @@ public class DatabaseManager {
         }
     }
 
-    // --- Pomodoro Session Management (Existing Methods - Potentially unused) ---
-    public boolean recordPomodoroSession(int userId, Integer todoId, int durationMinutes, String sessionType) {
-        String sql = "INSERT INTO pomodoro_sessions (user_id, todo_id, duration_minutes, session_type) VALUES (?, ?, ?, ?)";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, userId);
-            if (todoId != null) {
-                pstmt.setInt(2, todoId);
-            } else {
-                pstmt.setNull(2, java.sql.Types.INTEGER);
-            }
-            pstmt.setInt(3, durationMinutes);
-            pstmt.setString(4, sessionType);
-            return pstmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.err.println("Error recording pomodoro session: " + e.getMessage());
-            return false;
-        }
-    }
-
-    public boolean completePomodoroSession(int sessionId) {
-        String sql = "UPDATE pomodoro_sessions SET completed = 1, end_time = CURRENT_TIMESTAMP WHERE session_id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, sessionId);
-            return pstmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.err.println("Error completing pomodoro session: " + e.getMessage());
-            return false;
-        }
-    }
-
     // --- Category Management (New Methods) ---
-
     /**
      * Gets all categories for a user.
      */

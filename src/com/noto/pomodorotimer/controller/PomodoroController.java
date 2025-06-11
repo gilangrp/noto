@@ -67,28 +67,6 @@ public class PomodoroController {
         view.setPauseButtonEnabled(state.isRunning());
     }
 
-    private int getMaxDurationForCurrentSession() {
-        switch (state.getCurrentSessionType()) {
-            case FOCUS:
-                return config.getFocusDuration();
-            case SHORT_BREAK:
-                return config.getShortBreakDuration();
-            case LONG_BREAK:
-                return config.getLongBreakDuration();
-            default:
-                return 1; // Should not happen
-        }
-    }
-
-    private String getSessionName(TimerState.SessionType type) {
-        switch (type) {
-            case FOCUS: return "Fokus";
-            case SHORT_BREAK: return "Jeda Singkat";
-            case LONG_BREAK: return "Jeda Panjang";
-            default: return "Unknown";
-        }
-    }
-
     // Method to play the sound
     private void playSound() {
         try {
