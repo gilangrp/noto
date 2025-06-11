@@ -191,16 +191,16 @@ public class HomeFrame extends JFrame {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         panel.setOpaque(false);
 
-        JButton notesButton = createStyledButton("Notes & ToDo", BUTTON_NOTES_COLOR);
+        // JButton notesButton = createStyledButton("Notes & ToDo", BUTTON_NOTES_COLOR);
         JButton pomodoroButton = createStyledButton("Pomodoro Timer", BUTTON_POMODORO_COLOR);
         CategoryButton categoryButton = new CategoryButton(userId);
 
-        notesButton.addActionListener(e -> {
-            SwingUtilities.invokeLater(() -> {
-                NotesToDo notesFrame = new NotesToDo(userId);
-                notesFrame.setVisible(true);
-            });
-        });
+        // notesButton.addActionListener(e -> {
+        //     SwingUtilities.invokeLater(() -> {
+        //         NotesToDo notesFrame = new NotesToDo(userId);
+        //         notesFrame.setVisible(true);
+        //     });
+        // });
 
         pomodoroButton.addActionListener(e -> {
             SwingUtilities.invokeLater(() -> {
@@ -212,7 +212,7 @@ public class HomeFrame extends JFrame {
             });
         });
 
-        panel.add(notesButton);
+        // panel.add(notesButton);
         panel.add(categoryButton);
         panel.add(pomodoroButton);
         return panel;
