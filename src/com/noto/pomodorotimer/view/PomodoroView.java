@@ -14,6 +14,7 @@ public class PomodoroView extends JFrame {
     private JButton startButton;
     private JButton pauseButton;
     private JButton resetButton;
+    private JButton floatButton;
     private JComboBox<String> presetComboBox;
     private JProgressBar progressBar;
 
@@ -61,7 +62,7 @@ public class PomodoroView extends JFrame {
         // Buttons
         gbc.gridy = 3;
         gbc.gridwidth = 1;
-        gbc.weightx = 0.33;
+        gbc.weightx = 0.25;
 
         gbc.gridx = 0;
         startButton = new JButton("Mulai");
@@ -76,10 +77,16 @@ public class PomodoroView extends JFrame {
         resetButton = new JButton("Reset");
         add(resetButton, gbc);
 
+        // Float Button
+        gbc.gridx = 3;
+        floatButton = new JButton("Float");
+        add(floatButton, gbc);
+        floatButton.addActionListener(e -> toggleFloatWindow());
+
         // Progress Bar
         gbc.gridx = 0;
         gbc.gridy = 4;
-        gbc.gridwidth = 3;
+        gbc.gridwidth = 4;
         gbc.weightx = 1.0;
         progressBar = new JProgressBar(0, 100);
         progressBar.setValue(0);
@@ -88,6 +95,12 @@ public class PomodoroView extends JFrame {
 
         pack(); // Adjust window size to fit components
         setMinimumSize(getSize()); // Prevent resizing smaller than packed size
+    }
+
+    private void toggleFloatWindow() {
+        boolean isFloating = isAlwaysOnTop();
+        setAlwaysOnTop(!isFloating);
+        floatButton.setText(isFloating ? "Float" : "Unfloat");
     }
 
     // --- Methods to update the view --- 
