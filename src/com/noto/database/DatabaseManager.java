@@ -19,7 +19,7 @@ public class DatabaseManager {
     // --- MySQL Configuration ---
     private static final String DB_HOST = "localhost";
     private static final String DB_PORT = "3306";
-    private static final String DB_NAME = "todolist_db_test_admin";
+    private static final String DB_NAME = "todolist_db";
     private static final String DB_USER = "root"; // Default MySQL username for testing
     private static final String DB_PASSWORD = ""; // Empty password for testing
     private static final String DB_URL = "jdbc:mysql://" + DB_HOST + ":" + DB_PORT + "/" + DB_NAME + "?user=" + DB_USER

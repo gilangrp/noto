@@ -246,11 +246,11 @@ public class HomeFrame extends JFrame {
         if (isAdmin) {
             // Admin: statistik dan notifikasi semua user
             counts = dbManager.getTaskCounts(0); // statistik semua user
-            notifications = dbManager.getPendingTaskNotifications(0, 5); // notifikasi semua user
+            notifications = dbManager.getPendingTaskNotifications(0, 100); // notifikasi semua user
         } else {
             // User biasa: hanya task milik sendiri
             counts = dbManager.getTaskCounts(userId);
-            notifications = dbManager.getPendingTaskNotifications(userId, 5);
+            notifications = dbManager.getPendingTaskNotifications(userId, 10);
         }
         int totalTasks = counts.getOrDefault("total", 0);
         int completedTasks = counts.getOrDefault("completed", 0);

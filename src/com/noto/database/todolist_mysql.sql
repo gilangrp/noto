@@ -44,7 +44,13 @@ CREATE TABLE `notes` (
 INSERT INTO `notes` (`note_id`, `user_id`, `title`, `content`, `created_at`, `updated_at`, `category_id`) VALUES
 (10, 2, 'koko', 'test', '2025-06-10 08:58:19', '2025-06-10 08:58:19', 5),
 (11, 2, 'sistem operasi p7', '', '2025-06-11 03:11:44', '2025-06-11 13:42:11', 4),
-(15, 2, 'lo', '', '2025-06-11 04:13:42', '2025-06-11 13:53:15', 4);
+(12, 3, 'Project Admin', 'Review data user dan task', '2025-06-11 10:00:00', '2025-06-11 10:00:00', 7),
+(13, 3, 'Meeting Tim', 'Diskusi fitur baru', '2025-06-11 10:10:00', '2025-06-11 10:10:00', 7),
+(14, 4, 'Tugas Akhir', 'Kerjakan bab 3', '2025-06-11 10:20:00', '2025-06-11 10:20:00', 8),
+(15, 2, ',Membuat Aplikasi', '', '2025-06-11 04:13:42', '2025-06-11 13:53:15', 4),
+(16, 5, 'Belajar Gitar', 'Latihan chord baru', '2025-06-11 10:30:00', '2025-06-11 10:30:00', 9),
+(17, 5, 'Baca Buku', 'Selesaikan novel', '2025-06-11 10:40:00', '2025-06-11 10:40:00', 9),
+(18, 4, 'Presentasi', 'Siapkan slide', '2025-06-11 10:50:00', '2025-06-11 10:50:00', 8);
 
 -- --------------------------------------------------------
 
@@ -68,7 +74,10 @@ INSERT INTO `note_categories` (`category_id`, `user_id`, `name`, `color`, `creat
 (2, 1, 'Uncategorized', '#FFFFFF', '2025-06-08 08:31:19'),
 (4, 2, 'tugas', '#ccff99', '2025-06-08 08:33:22'),
 (5, 2, 'Uncategorized', '#FFFFFF', '2025-06-08 08:34:49'),
-(6, 3, 'TEST', '#ff99cc', '2025-06-10 08:17:59');
+(6, 3, 'Kampus', '#ff99cc', '2025-06-10 08:17:59'),
+(7, 3, 'Kerja', '#99ccff', '2025-06-11 09:00:00'),
+(8, 4, 'Kuliah', '#ffcc99', '2025-06-11 09:10:00'),
+(9, 5, 'Hobi', '#cc99ff', '2025-06-11 09:20:00');
 
 -- --------------------------------------------------------
 
@@ -88,8 +97,14 @@ CREATE TABLE `note_todos` (
 --
 
 INSERT INTO `note_todos` (`todo_id`, `note_id`, `description`, `completed`) VALUES
-(19, 11, 'test kl', 0),
-(21, 15, 'nulis', 0);
+(19, 11, 'Menulis halaman 5', 0),
+(20, 12, 'Cek data user', 1),
+(21, 13, 'Buat agenda meeting', 0),
+(22, 14, 'Cari referensi', 1),
+(23, 15, 'nulis', 0),
+(24, 16, 'Latihan 30 menit', 0),
+(25, 17, 'Baca 20 halaman', 1),
+(26, 18, 'Buat outline', 0);
 
 -- --------------------------------------------------------
 
@@ -115,7 +130,9 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`user_id`, `full_name`, `email`, `username`, `password`, `created_at`, `last_login`, `is_admin`) VALUES
 (1, 'Test User', 'test@example.com', 'testuser', 'password123', '2025-06-07 15:00:52', NULL, 0),
 (2, 'septiawan', 'septi@gmail.com', 'septi', '1234', '2025-06-07 15:01:35', '2025-06-11 14:44:52', 0),
-(3, 'gilang', 'gilang@gmail.com', 'gilang', '123456', '2025-06-10 08:07:09', '2025-06-10 08:09:38', 1);
+(3, 'admin', 'admin@gmail.com', 'admin', '123456', '2025-06-10 08:07:09', '2025-06-10 08:09:38', 1),
+(4, 'Ayu Lestari', 'ayu@gmail.com', 'ayu', 'ayu2025', '2025-06-10 09:00:00', NULL, 0),
+(5, 'Budi Santoso', 'budi@gmail.com', 'budi', 'budi2025', '2025-06-10 09:10:00', NULL, 0);
 
 -- --------------------------------------------------------
 
@@ -212,7 +229,7 @@ ALTER TABLE `note_todos`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `user_settings`
