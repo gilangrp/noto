@@ -454,8 +454,12 @@ public class NotesToDo extends JFrame {
     // Loads all notes for the current user from the database into the notesMap and UI list
     private void loadFromDatabase() {
         DatabaseManager dbManager = DatabaseManager.getInstance();
-        notesMap = dbManager.loadNotes(userId);
-        
+        // Cek admin: userId == 0 dianggap admin (atau bisa cek dbManager.isUserAdmin(userId) jika ingin lebih aman)
+        if (userId == 0 || dbManager.isUserAdmin(userId)) {
+            notesMap = dbManager.loadNotesWithAdmin(userId);
+        } else {
+            notesMap = dbManager.loadNotes(userId);
+        }
         // Update UI list model
         noteListModel.clear();
         List<String> sortedTitles = new ArrayList<>(notesMap.keySet());
