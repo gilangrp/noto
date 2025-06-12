@@ -1,15 +1,12 @@
 package com.noto.auth;
+
 import javax.swing.*;
-import javax.swing.border.*;
 import java.awt.*;
 import java.awt.event.*;
-import javax.swing.event.*; // Keep for DocumentListener
 
 import com.noto.database.DatabaseManager;
 
-import java.util.regex.Pattern;
-
-public class RegisterFrame extends JFrame {
+public class RegisterFrame extends AbstractAuthFrame {
     private JTextField nameField;
     private JTextField emailField;
     private JTextField usernameField;
@@ -21,19 +18,11 @@ public class RegisterFrame extends JFrame {
     private JLabel validationLabel; // Keep for simple validation messages
     
     // Email validation pattern
-    private static final Pattern EMAIL_PATTERN = 
-        Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
-        
-    // Style constants consistent with LoginFrame
-    private static final Font UI_FONT = new Font("SansSerif", Font.PLAIN, 14);
-    private static final Font BOLD_FONT = new Font("SansSerif", Font.BOLD, 14);
-    private static final Font TITLE_FONT = new Font("SansSerif", Font.BOLD, 24);
-    private static final Color BACKGROUND_COLOR = new Color(245, 245, 245);
-    private static final Color TEXT_COLOR = new Color(50, 50, 80);
-    private static final Color BUTTON_COLOR = new Color(186, 225, 255); // Blue soft 
+    private static final java.util.regex.Pattern EMAIL_PATTERN = 
+        java.util.regex.Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", java.util.regex.Pattern.CASE_INSENSITIVE);
+    
+    // Register button color (not in AbstractAuthFrame)
     private static final Color REGISTER_BUTTON_COLOR = new Color(144, 238, 144); // Light green for register
-    private static final Color LINK_COLOR = new Color(65, 105, 225);
-    private static final Color BORDER_COLOR = new Color(200, 200, 225);
     private static final Color ERROR_COLOR = Color.RED;
 
     public RegisterFrame() {
@@ -72,24 +61,6 @@ public class RegisterFrame extends JFrame {
         mainPanel.add(contentPanel, gbc);
         
         // Removed fade-in animation
-    }
-    
-    private void applyGlobalStyles() {
-        UIManager.put("Label.font", UI_FONT);
-        UIManager.put("Button.font", BOLD_FONT);
-        UIManager.put("TextField.font", UI_FONT);
-        UIManager.put("PasswordField.font", UI_FONT);
-        UIManager.put("CheckBox.font", UI_FONT);
-        UIManager.put("Panel.background", BACKGROUND_COLOR);
-        UIManager.put("OptionPane.background", BACKGROUND_COLOR);
-        UIManager.put("OptionPane.messageForeground", Color.BLACK);
-        // Set consistent border for text fields
-        Border fieldBorder = BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(BORDER_COLOR, 1),
-            BorderFactory.createEmptyBorder(5, 8, 5, 8) // Padding inside border
-        );
-        UIManager.put("TextField.border", fieldBorder);
-        UIManager.put("PasswordField.border", fieldBorder);
     }
     
     private void setupComponents(JPanel panel) {
@@ -132,13 +103,13 @@ public class RegisterFrame extends JFrame {
         showPasswordCheckbox.setFocusPainted(false);
         showPasswordCheckbox.setMargin(new Insets(0, 0, 10, 0)); // Add bottom margin
         
-        showPasswordCheckbox.addActionListener(e -> {
-            boolean show = showPasswordCheckbox.isSelected();
-            // Corrected ternary operator for setEchoChar
-            passwordField.setEchoChar(show ? (char) 0 : 
-'\u2022'); 
-            confirmPasswordField.setEchoChar(show ? (char) 0 : 
-'\u2022');
+        showPasswordCheckbox.addActionListener(new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                boolean show = showPasswordCheckbox.isSelected();
+                passwordField.setEchoChar(show ? (char) 0 : '\u2022');
+                confirmPasswordField.setEchoChar(show ? (char) 0 : '\u2022');
+            }
         });
         
         // Add checkbox to a panel to control alignment if needed
@@ -167,7 +138,7 @@ public class RegisterFrame extends JFrame {
         registerButton.setMinimumSize(buttonSize);
         
         // Add action listener
-        registerButton.addActionListener(e -> handleRegistration());
+        registerButton.addActionListener(this::handleRegistration);
         
         panel.add(registerButton);
         panel.add(Box.createRigidArea(new Dimension(0, 20)));
@@ -229,7 +200,7 @@ public class RegisterFrame extends JFrame {
     }
 
     // Helper method to handle registration logic
-    private void handleRegistration() {
+    private void handleRegistration(java.awt.event.ActionEvent e) {
         if (validateRegistration()) {
             String fullName = nameField.getText().trim();
             String email = emailField.getText().trim();
@@ -255,12 +226,7 @@ public class RegisterFrame extends JFrame {
             
             if (success) {
                 // Get the user ID of the newly registered user
-                int userId = dbManager.authenticateUser(username, password);
-                
-                // Create default settings for the user (if applicable)
-                // if (userId > 0) {
-                //     dbManager.createDefaultSettings(userId);
-                // }
+                dbManager.authenticateUser(username, password); // Removed unused variable userId
                 
                 JOptionPane.showMessageDialog(this, "Registration successful! Please login.", "Success", JOptionPane.INFORMATION_MESSAGE);
                 
@@ -325,68 +291,4 @@ public class RegisterFrame extends JFrame {
     private void showValidationError(String message) {
         validationLabel.setText(message);
     }
-
-    // Helper to create styled buttons (consistent with NotesToDo/HomeFrame)
-    private JButton createStyledButton(String text, Color bgColor) {
-        JButton button = new JButton(text);
-        button.setBackground(bgColor);
-        button.setForeground(Color.BLACK);
-        button.setFocusPainted(false);
-        button.setFont(BOLD_FONT); 
-        button.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(bgColor.darker(), 1),
-            BorderFactory.createEmptyBorder(8, 15, 8, 15) 
-        ));
-        // Add hover effect (optional, simple version)
-        button.addMouseListener(new MouseAdapter() {
-             Color originalColor = button.getBackground();
-             @Override
-             public void mouseEntered(MouseEvent e) {
-                 button.setBackground(originalColor.brighter());
-                 button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-             }
-             @Override
-             public void mouseExited(MouseEvent e) {
-                 button.setBackground(originalColor);
-             }
-        });
-        return button;
-    }
-    
-    // Helper method for placeholder text (same as LoginFrame)
-    private void addPlaceholder(JTextField field, String placeholder) {
-        field.setForeground(Color.GRAY);
-        field.setText(placeholder);
-
-        field.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                if (field.getText().equals(placeholder)) {
-                    field.setText("");
-                    field.setForeground(TEXT_COLOR); // Use standard text color
-                    if (field instanceof JPasswordField) {
-                        ((JPasswordField) field).setEchoChar('*'); // Set echo char for password
-                    }
-                }
-            }
-            @Override
-            public void focusLost(FocusEvent e) {
-                if (field.getText().isEmpty()) {
-                    if (field instanceof JPasswordField) {
-                        ((JPasswordField) field).setEchoChar((char) 0); // Clear echo char for placeholder
-                    }
-                    field.setForeground(Color.GRAY);
-                    field.setText(placeholder);
-                }
-            }
-        });
-        
-        // Special handling for password field initial state
-        if (field instanceof JPasswordField) {
-             ((JPasswordField) field).setEchoChar((char) 0);
-        }
-    }
-    
-    // Removed GradientPanel, TransparentPanel, RoundedBorder classes
-    // Removed FontAwesomeUtils and AnimationUtils dependencies
 }

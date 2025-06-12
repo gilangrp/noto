@@ -5,7 +5,7 @@ import java.io.InputStream;
 /**
  * Utility class for loading and using FontAwesome icons
  */
-public class FontAwesomeUtils {
+public abstract class FontAwesomeUtils {
     private static Font fontAwesome = null;
     
     /**
